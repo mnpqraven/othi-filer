@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { GeistSans } from "geist/font/sans";
 import { AppProvider } from "@/components/providers";
-import { Sidebar } from "@/components/Sidebar";
 
 export const metadata: Metadata = {
   title: "Filer",
@@ -17,13 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={GeistSans.className}>
-        <AppProvider>
-          <div className="flex">
-            <Sidebar />
-
-            {children}
-          </div>
-        </AppProvider>
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );

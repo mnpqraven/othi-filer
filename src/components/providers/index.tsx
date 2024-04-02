@@ -23,7 +23,7 @@ export function AppProvider({ children }: Prop) {
         <Provider>
           {children}
 
-          <DevTools />
+          <DevTools theme="dark" />
         </Provider>
       </ThemeProvider>
     </ProcessEventHandlers>
