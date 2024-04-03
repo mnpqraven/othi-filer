@@ -55,7 +55,7 @@ export function Panel({ panelType }: { panelType: "left" | "right" }) {
       </div>
       <div id="selected-block" className="h-24 rounded-md border">
         {pathList.map((path) => (
-          <PathLine path={path} key={path} />
+          <PathLine path={path} name={path} key={path} />
         ))}
       </div>
     </div>
