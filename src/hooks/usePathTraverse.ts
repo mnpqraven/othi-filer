@@ -1,7 +1,8 @@
+/* eslint-disable no-console */
 import { readDir } from "@tauri-apps/api/fs";
 import { useQuery } from "@tanstack/react-query";
-import { useHomeDir } from "./useHomeDir";
 import { useEffect, useState } from "react";
+import { useHomeDir } from "./useHomeDir";
 
 interface ListOpt {
   hello: "world";
