@@ -1,3 +1,3 @@
-export function PathLine({ path }: { path: string }) {
-  return <div>{path}</div>;
+export function PathLine({ path, name }: { path: string; name: string }) {
+  return <div>{name}</div>;
 }

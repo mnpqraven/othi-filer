@@ -1,9 +1,9 @@
+"use client";
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-"use client";
 
 import { FolderOpen } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { open } from "@tauri-apps/api/dialog";
 import { Button } from "@/components/ui/button";
 import { usePathTraverse } from "@/hooks/usePathTraverse";
@@ -40,7 +40,7 @@ export function Panel({ panelType }: { panelType: "left" | "right" }) {
           ..
         </div>
         <div>
-          {listQuery.data?.map(({ path }) => (
+          {listQuery.data?.children.map(({ path, name }) => (
             <div
               className="cursor-pointer"
               onClick={() => {
@@ -48,7 +48,7 @@ export function Panel({ panelType }: { panelType: "left" | "right" }) {
               }}
               key={path}
             >
-              <PathLine path={path} key={path} />
+              <PathLine path={path} name={name} key={path} />
             </div>
           ))}
         </div>

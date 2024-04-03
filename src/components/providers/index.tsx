@@ -23,11 +23,6 @@ interface Prop {
 }
 export function AppProvider({ children }: Prop) {
   // disables context menu in prod
-  if (process.env.NODE_ENV === "production") {
-    document.addEventListener("contextmenu", (event) => {
-      event.preventDefault();
-    });
-  }
 
   const [queryClient] = useState(() => new QueryClient(TANSTACK_CONFIG));
 

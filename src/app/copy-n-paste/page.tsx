@@ -1,8 +1,5 @@
-import dynamic from "next/dynamic";
+import { Panel } from "./Panel";
 
-const Panel = dynamic(() => import("./Panel").then((e) => e.Panel), {
-  ssr: false,
-});
 export default function Page() {
   return (
     <div className="flex flex-1 justify-center gap-4">
