@@ -16,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={GeistSans.className}>
-        <AppProvider>{children}</AppProvider>
+        <AppProvider>
+          <div className="flex h-screen w-screen flex-col">{children}</div>
+        </AppProvider>
       </body>
     </html>
   );

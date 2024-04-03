@@ -99,10 +99,10 @@ function DropdownTree({
   return (
     <>
       {data.map((subgroupOrItem, index) => (
-        <>
+        <Fragment key={index}>
           <SubgroupOrItem data={subgroupOrItem} key={index} />
           {separator ? <MenubarSeparator /> : null}
-        </>
+        </Fragment>
       ))}
     </>
   );

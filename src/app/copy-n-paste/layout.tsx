@@ -2,14 +2,22 @@ import { type ReactNode } from "react";
 import { MenuTopbar } from "@/components/MenuTopbar";
 import { SidebarThumb } from "@/components/SidebarThumb";
 
+/**
+ * This layout only adds menu bar on top
+ * TODO:
+ * - move menubar to outer layouts if needed
+ * - move sidebar thumb to outer layouts, conditional rendering with viewport
+ *   size ??
+ */
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex flex-col">
+    <>
       <div className="flex gap-2">
-      <SidebarThumb />
-      <MenuTopbar />
+        <SidebarThumb />
+        <MenuTopbar />
       </div>
+
       {children}
-    </div>
+    </>
   );
 }

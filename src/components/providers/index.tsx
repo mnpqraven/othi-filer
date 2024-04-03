@@ -1,10 +1,22 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Provider } from "jotai";
 import { DevTools } from "jotai-devtools";
+import {
+  QueryClient,
+  type QueryClientConfig,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import { ProcessEventHandlers } from "./eventHandlers";
+
+const TANSTACK_CONFIG: QueryClientConfig = {
+  defaultOptions: {
+    queries: { refetchOnWindowFocus: false },
+  },
+};
 
 interface Prop {
   children: ReactNode;
@@ -17,14 +29,19 @@ export function AppProvider({ children }: Prop) {
     });
   }
 
+  const [queryClient] = useState(() => new QueryClient(TANSTACK_CONFIG));
+
   return (
     <ProcessEventHandlers>
       <ThemeProvider attribute="class">
-        <Provider>
-          {children}
+        <QueryClientProvider client={queryClient}>
+          <Provider>
+            {children}
 
-          <DevTools theme="dark" />
-        </Provider>
+            <DevTools theme="dark" />
+            <ReactQueryDevtools initialIsOpen={false} />
+          </Provider>
+        </QueryClientProvider>
       </ThemeProvider>
     </ProcessEventHandlers>
   );
