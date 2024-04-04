@@ -9,8 +9,8 @@ import { useHomeDir } from "@/hooks/useHomeDir";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { DirPanel } from "./DirPanel";
 import { Input } from "@/components/ui/input";
+import { DirPanel } from "./DirPanel";
 
 interface Prop extends HTMLAttributes<HTMLDivElement> {
   panelType: "left" | "right";
@@ -19,8 +19,6 @@ export const Panel = forwardRef<HTMLDivElement, Prop>(function Panel(
   { panelType: _, children: _children, className, ...props },
   ref,
 ) {
-  const [_pathList, setPathList] = useState<string[]>([]);
-
   const [path, setPath] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
   const { data: homeData } = useHomeDir();
@@ -42,16 +40,15 @@ export const Panel = forwardRef<HTMLDivElement, Prop>(function Panel(
   }, [homeData]);
 
   async function openFolderSelect() {
-    const selectedPaths = await open({ directory: true, multiple: true }); // string[] | null
+    const selectedPaths = await open({ directory: true, multiple: false }); // string[] | null
     if (selectedPaths) {
-      if (Array.isArray(selectedPaths)) setPathList(selectedPaths);
-      else setPathList([selectedPaths]);
+      if (!Array.isArray(selectedPaths)) setPath(selectedPaths);
     }
   }
 
   return (
     <div className={cn("flex flex-col gap-2", className)} {...props} ref={ref}>
-      <Input value={listData?.path} />
+      <Input value={path ?? ""} readOnly />
       <div className="flex justify-between">
         <Button variant="outline" className="p-2.5" onClick={openFolderSelect}>
           <FolderOpen className="h-5 w-5" />

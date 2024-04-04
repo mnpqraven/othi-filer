@@ -7,9 +7,11 @@ interface LinkItem {
   description?: string;
 }
 export default function LandingPage() {
-  const links: LinkItem[] = [{ href: "/copy-n-paste", title: "Copy & Paste" }];
+  const links: LinkItem[] = [
+    { href: "/copy-n-paste", title: "Copy & Paste", description: "ree" },
+  ];
   return (
-    <div className="grid grid-cols-2">
+    <div className="grid grid-cols-2 p-8">
       {links.map((link) => (
         <LinkItem key={link.href} {...link} />
       ))}
@@ -20,7 +22,10 @@ export default function LandingPage() {
 function LinkItem({ href, title, description }: LinkItem) {
   return (
     <Button asChild variant="outline">
-      <Link href={href}>{title}</Link>
+      <Link href={href} className="flex flex-col py-8">
+        <span className="font-bold">{title}</span>
+        <span>{description}</span>
+      </Link>
     </Button>
   );
 }

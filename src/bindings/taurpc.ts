@@ -22,7 +22,7 @@ export type TauRpcApiInputTypes = { proc_name: "hello_world"; input_type: null }
 
 export type TauRpcDirActionOutputTypes = { proc_name: "list_dir"; output_type: ListDirOut } | { proc_name: "forward"; output_type: ListDirOut } | { proc_name: "back"; output_type: ListDirOut }
 
-const ARGS_MAP = {"":"{\"hello_world\":[]}","actions":"{\"back\":[\"params\"],\"list_dir\":[\"params\"],\"forward\":[\"params\"]}","data":"{\"home_dir\":[]}"}
+const ARGS_MAP = {"actions":"{\"back\":[\"params\"],\"list_dir\":[\"params\"],\"forward\":[\"params\"]}","data":"{\"home_dir\":[]}","":"{\"hello_world\":[]}"}
 import { createTauRPCProxy as createProxy } from "taurpc"
 
 export const createTauRPCProxy = () => createProxy<Router>(ARGS_MAP)
