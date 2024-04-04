@@ -21,6 +21,7 @@ const Label = React.forwardRef<
     {...props}
   />
 ))
+// @ts-expect-error type override
 Label.displayName = LabelPrimitive.Root.displayName
 
 export { Label }

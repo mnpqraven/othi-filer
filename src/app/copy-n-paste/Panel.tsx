@@ -21,6 +21,7 @@ export const Panel = forwardRef<HTMLDivElement, Prop>(function Panel(
 ) {
   const [path, setPath] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
+
   const { data: homeData } = useHomeDir();
   const { data: listData } = useList({ path, show_hidden: hidden });
 
@@ -72,12 +73,8 @@ export const Panel = forwardRef<HTMLDivElement, Prop>(function Panel(
         onNameSelect={(to_folder) => {
           if (path) forward({ path, to_folder });
         }}
+        scrollToTop
       />
-      {/* <div id="selected-block" className="h-24 rounded-md border">
-        {pathList.map((path, index) => (
-          <PathLine path={path} name={path} key={`${path}-${index}`} />
-        ))}
-      </div> */}
     </div>
   );
 });

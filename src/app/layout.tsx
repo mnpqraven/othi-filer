@@ -3,6 +3,7 @@ import "./globals.css";
 import { GeistSans } from "geist/font/sans";
 import { AppProvider } from "@/components/providers";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {
   title: "Filer",
@@ -21,6 +22,7 @@ export default function RootLayout({
           {children}
 
           <Toaster />
+          <Sonner />
         </AppProvider>
       </body>
     </html>

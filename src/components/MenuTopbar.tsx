@@ -72,12 +72,12 @@ export function MenuTopbar() {
           <MenubarTrigger>{menu.label}</MenubarTrigger>
           <MenubarContent>
             {menu.subgroupItems.map((dropdownConf, index) => (
-              <>
-                <DropdownTree key={index} data={dropdownConf} />
+              <Fragment key={index}>
+                <DropdownTree data={dropdownConf} />
                 {index + 1 < menu.subgroupItems.length ? (
                   <MenubarSeparator />
                 ) : null}
-              </>
+              </Fragment>
             ))}
           </MenubarContent>
         </MenubarMenu>
@@ -107,12 +107,12 @@ function SubgroupOrItem({ data }: { data: ContextSubGroupItem }) {
         <MenubarSubTrigger>{data.label}</MenubarSubTrigger>
         <MenubarSubContent>
           {data.subgroupItems.map((dropdownConf, index) => (
-            <>
-              <DropdownTree key={index} data={dropdownConf} />
+            <Fragment key={index}>
+              <DropdownTree data={dropdownConf} />
               {index + 1 < data.subgroupItems.length ? (
                 <MenubarSeparator />
               ) : null}
-            </>
+            </Fragment>
           ))}
         </MenubarSubContent>
       </MenubarSub>
