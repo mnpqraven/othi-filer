@@ -1,10 +1,14 @@
-use std::fs::DirEntry;
 use std::path::Path;
 
 #[cfg(unix)]
-pub fn is_hidden(file: &DirEntry) -> Result<bool, String> {
-    use std::os::unix::ffi::OsStrExt;
-    let res = file.file_name().as_os_str().as_bytes()[0] != b'.';
+pub fn is_hidden(file: &Path) -> Result<bool, String> {
+    let res = file
+        .file_name()
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_owned()
+        .starts_with(b'.');
     Ok(res)
 }
 
