@@ -8,7 +8,7 @@ pub fn is_hidden(file: &Path) -> Result<bool, String> {
         .to_str()
         .unwrap()
         .to_owned()
-        .starts_with(b'.');
+        .starts_with('.');
     Ok(res)
 }
 
