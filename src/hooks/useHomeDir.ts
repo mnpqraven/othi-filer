@@ -1,16 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { createRpc } from "@/bindings";
 
 export function useHomeDir() {
   return useQuery({
     queryKey: ["homeDir"],
-    queryFn: async () => getHomeDirPath(),
+    queryFn: async () => {
+      const rpc = await createRpc();
+      return await rpc.data.home_dir();
+    },
   });
-}
-
-async function getHomeDirPath() {
-  const { homeDir } = await import("@tauri-apps/api/path");
-  const home = await homeDir();
-  return { home };
 }

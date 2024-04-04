@@ -1,18 +1,45 @@
 "use client";
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 
 import { FolderOpen } from "lucide-react";
-import { useState } from "react";
+import { type HTMLAttributes, forwardRef, useEffect, useState } from "react";
 import { open } from "@tauri-apps/api/dialog";
 import { Button } from "@/components/ui/button";
-import { usePathTraverse } from "@/hooks/usePathTraverse";
-import { PathLine } from "./PathLine";
+import { useBack, useForward, useList } from "@/hooks/dirAction/useDirAction";
+import { useHomeDir } from "@/hooks/useHomeDir";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import { DirPanel } from "./DirPanel";
+import { Input } from "@/components/ui/input";
 
-export function Panel({ panelType }: { panelType: "left" | "right" }) {
-  const [pathList, setPathList] = useState<string[]>([]);
+interface Prop extends HTMLAttributes<HTMLDivElement> {
+  panelType: "left" | "right";
+}
+export const Panel = forwardRef<HTMLDivElement, Prop>(function Panel(
+  { panelType: _, children: _children, className, ...props },
+  ref,
+) {
+  const [_pathList, setPathList] = useState<string[]>([]);
 
-  const { listQuery, path, back, forward } = usePathTraverse();
+  const [path, setPath] = useState<string | null>(null);
+  const [hidden, setHidden] = useState(false);
+  const { data: homeData } = useHomeDir();
+  const { data: listData } = useList({ path, show_hidden: hidden });
+
+  const { mutate: back } = useBack({
+    onSuccess({ path }) {
+      setPath(path);
+    },
+  });
+  const { mutate: forward } = useForward({
+    onSuccess({ path }) {
+      setPath(path);
+    },
+  });
+
+  useEffect(() => {
+    if (homeData) setPath(homeData);
+  }, [homeData]);
 
   async function openFolderSelect() {
     const selectedPaths = await open({ directory: true, multiple: true }); // string[] | null
@@ -23,41 +50,37 @@ export function Panel({ panelType }: { panelType: "left" | "right" }) {
   }
 
   return (
-    <div className="flex flex-1 grow flex-col gap-2">
-      Path: {path}
-      <div>
+    <div className={cn("flex flex-col gap-2", className)} {...props} ref={ref}>
+      <Input value={listData?.path} />
+      <div className="flex justify-between">
         <Button variant="outline" className="p-2.5" onClick={openFolderSelect}>
           <FolderOpen className="h-5 w-5" />
         </Button>
-      </div>
-      <div id="explorer" className="flex grow flex-col rounded-md border">
-        <div
-          className="cursor-pointer"
-          onClick={() => {
-            back();
-          }}
-        >
-          ..
-        </div>
-        <div>
-          {listQuery.data?.children.map(({ path, name }) => (
-            <div
-              className="cursor-pointer"
-              onClick={() => {
-                forward({ pathName: path });
-              }}
-              key={path}
-            >
-              <PathLine path={path} name={name} key={path} />
-            </div>
-          ))}
+
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="hidden"
+            onCheckedChange={(checked) => {
+              setHidden(checked === "indeterminate" ? false : checked);
+            }}
+          />
+          <Label htmlFor="hidden">Hidden Files</Label>
         </div>
       </div>
-      <div id="selected-block" className="h-24 rounded-md border">
-        {pathList.map((path) => (
-          <PathLine path={path} name={path} key={path} />
+      <DirPanel
+        dirs={listData?.children ?? []}
+        onBack={() => {
+          if (path) back({ path });
+        }}
+        onNameSelect={(to_folder) => {
+          if (path) forward({ path, to_folder });
+        }}
+      />
+      {/* <div id="selected-block" className="h-24 rounded-md border">
+        {pathList.map((path, index) => (
+          <PathLine path={path} name={path} key={`${path}-${index}`} />
         ))}
-      </div>
+      </div> */}
     </div>
   );
-}
+});

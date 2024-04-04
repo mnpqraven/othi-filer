@@ -1,11 +1,29 @@
+import { SidebarThumb } from "@/components/SidebarThumb";
+import { MenuTopbar } from "@/components/MenuTopbar";
 import { Panel } from "./Panel";
+import { MiddleActionRow } from "./MiddleActionRow";
 
+/**
+ * TODO:
+ * - move menubar to outer layouts if needed
+ * - move sidebar thumb to outer layouts, conditional rendering with viewport
+ *   size ??
+ */
 export default function Page() {
   return (
-    <div className="flex flex-1 justify-center gap-4">
-      <Panel panelType="left" />
-      <div className="grow-0">middle actions</div>
-      <Panel panelType="right" />
+    <div className="flex flex-col h-screen px-4 py-2 gap-2">
+      <div className="flex gap-2">
+        <SidebarThumb />
+        <MenuTopbar />
+      </div>
+
+      <div className="flex justify-center gap-4 min-h-0 h-full">
+        <Panel panelType="left" className="w-5/12" />
+
+        <MiddleActionRow className="grow-0 self-center" />
+
+        <Panel panelType="right" className="w-5/12" />
+      </div>
     </div>
   );
 }

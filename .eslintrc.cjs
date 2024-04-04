@@ -38,7 +38,7 @@ module.exports = {
       },
     },
   },
-  ignorePatterns: ["node_modules/", "dist/", "src-tauri/"],
+  ignorePatterns: ["node_modules/", "dist/", "src-tauri/", "src/bindings/", "src/components/ui"],
   // add rules configurations here
   rules: {
     "import/no-default-export": "off",

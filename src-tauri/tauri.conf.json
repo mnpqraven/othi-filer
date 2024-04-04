@@ -16,16 +16,6 @@
       "dialog": {
         "all": true
       },
-      "fs": {
-        "readDir": true,
-        "exists": true,
-        "scope": [
-          "*/**"
-        ]
-      },
-      "path": {
-        "all": true
-      },
       "notification": {
         "all": true
       },

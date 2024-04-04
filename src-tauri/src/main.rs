@@ -1,15 +1,18 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-pub mod actions;
-pub mod common;
+pub mod procedures;
+pub mod utils;
 
+use crate::procedures::create_router;
 use tauri::Manager;
-use actions::fs::list_dir;
 
-fn main() {
+#[tokio::main]
+async fn main() {
+    let router = create_router();
+
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![list_dir])
+        .invoke_handler(router.into_handler())
         .setup(|app| {
             #[cfg(debug_assertions)]
             {
@@ -20,4 +23,6 @@ fn main() {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    println!("application generated")
 }
