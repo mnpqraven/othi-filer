@@ -3,8 +3,8 @@ on:
   push:
     tags:
       - "v*"
-    branches:
-      - dev
+    # branches:
+    #   - dev
   workflow_dispatch:
 
 jobs:
