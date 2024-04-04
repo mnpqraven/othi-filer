@@ -42,7 +42,6 @@ export function MenuTopbar() {
           { label: "New Window" },
         ],
         [
-          { label: "New Window" },
           {
             label: "Share",
             subgroupItems: [
@@ -51,17 +50,15 @@ export function MenuTopbar() {
               [{ label: "other", subgroupItems: [[{ label: "custom" }]] }],
             ],
           },
+          { label: "Print" },
         ],
-        [{ label: "Print" }],
+        [{ label: "About" }],
       ],
     },
     {
       label: "Edit",
       subgroupItems: [
-        [
-          { label: "New Tab", shortcut: { key: "T", modifiers: ["CTRL"] } },
-          { label: "New Window" },
-        ],
+        [{ label: "New Tab", shortcut: { key: "T", modifiers: ["CTRL"] } }],
         [{ label: "New Window" }],
         [{ label: "Print" }],
       ],
@@ -75,11 +72,12 @@ export function MenuTopbar() {
           <MenubarTrigger>{menu.label}</MenubarTrigger>
           <MenubarContent>
             {menu.subgroupItems.map((dropdownConf, index) => (
-              <DropdownTree
-                key={index}
-                data={dropdownConf}
-                separator={index > 0 && index + 1 !== menu.subgroupItems.length}
-              />
+              <>
+                <DropdownTree key={index} data={dropdownConf} />
+                {index + 1 < menu.subgroupItems.length ? (
+                  <MenubarSeparator />
+                ) : null}
+              </>
             ))}
           </MenubarContent>
         </MenubarMenu>
@@ -88,19 +86,12 @@ export function MenuTopbar() {
   );
 }
 
-function DropdownTree({
-  data,
-  separator,
-}: {
-  data: ContextSubGroupItem[];
-  separator?: boolean;
-}) {
+function DropdownTree({ data }: { data: ContextSubGroupItem[] }) {
   return (
     <>
       {data.map((subgroupOrItem, index) => (
         <Fragment key={index}>
           <SubgroupOrItem data={subgroupOrItem} key={index} />
-          {separator ? <MenubarSeparator /> : null}
         </Fragment>
       ))}
     </>
@@ -116,11 +107,12 @@ function SubgroupOrItem({ data }: { data: ContextSubGroupItem }) {
         <MenubarSubTrigger>{data.label}</MenubarSubTrigger>
         <MenubarSubContent>
           {data.subgroupItems.map((dropdownConf, index) => (
-            <DropdownTree
-              key={index}
-              data={dropdownConf}
-              separator={index > 0 && index + 1 !== data.subgroupItems.length}
-            />
+            <>
+              <DropdownTree key={index} data={dropdownConf} />
+              {index + 1 < data.subgroupItems.length ? (
+                <MenubarSeparator />
+              ) : null}
+            </>
           ))}
         </MenubarSubContent>
       </MenubarSub>
