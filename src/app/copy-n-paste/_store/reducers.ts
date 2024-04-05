@@ -13,13 +13,29 @@ export function copyPanelReducer(
       switch (payload.side) {
         case "left":
           return {
-            left: { path: payload.to, selected: prev.left.selected },
+            left: { ...prev.left, path: payload.to },
             right: prev.right,
           };
         case "right":
           return {
             left: prev.left,
-            right: { path: payload.to, selected: prev.right.selected },
+            right: { ...prev.right, path: payload.to },
+          };
+        default:
+          return prev;
+      }
+    }
+    case "setHidden": {
+      switch (payload.side) {
+        case "left":
+          return {
+            left: { ...prev.left, show_hidden: payload.to },
+            right: prev.right,
+          };
+        case "right":
+          return {
+            left: prev.left,
+            right: { ...prev.right, show_hidden: payload.to },
           };
         default:
           return prev;

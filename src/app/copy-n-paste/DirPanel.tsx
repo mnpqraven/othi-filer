@@ -1,13 +1,12 @@
 import { forwardRef, type ComponentPropsWithoutRef } from "react";
-import { Folder, File, ArrowUpToLine } from "lucide-react";
+import { ArrowUpToLine } from "lucide-react";
 import { Transition } from "@headlessui/react";
 import { type DirItem } from "@/bindings/taurpc";
 import { cn } from "@/lib/utils";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { FileName } from "@/components/FileName";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useScroll } from "@/hooks/event/useScroll";
+import { DirPanelItem } from "./DirPanelItem";
 
 interface Prop extends ComponentPropsWithoutRef<typeof ScrollArea> {
   dirs: DirItem[];
@@ -15,9 +14,11 @@ interface Prop extends ComponentPropsWithoutRef<typeof ScrollArea> {
   onNameSelect?: (name: string) => void;
   onBack?: () => void;
   scrollToTop?: boolean;
+  side: "left" | "right";
 }
 export const DirPanel = forwardRef<HTMLDivElement, Prop>(function DirPanel(
   {
+    side,
     dirs,
     onCheckboxSelect,
     className,
@@ -44,7 +45,7 @@ export const DirPanel = forwardRef<HTMLDivElement, Prop>(function DirPanel(
       {onBack ? (
         <Button
           variant="ghost"
-          className="ml-6 justify-start w-full"
+          className="ml-6 w-full justify-start"
           onClick={() => {
             onBack();
           }}
@@ -52,34 +53,8 @@ export const DirPanel = forwardRef<HTMLDivElement, Prop>(function DirPanel(
           ..
         </Button>
       ) : null}
-      {dirs.map(({ name, is_folder }, index) => (
-        <div
-          className="cursor-pointer flex gap-2 items-center"
-          key={`${name}-${String(index)}`}
-        >
-          <Checkbox
-            onCheckedChange={(e) => {
-              if (onCheckboxSelect) {
-                if (e !== "indeterminate") onCheckboxSelect(name, e);
-                else onCheckboxSelect(name, false);
-              }
-            }}
-          />
-          <Button
-            variant="ghost"
-            className="hover:underline px-2 py-0 justify-start gap-2 flex-1 min-w-0"
-            onClick={() => {
-              if (onNameSelect && is_folder) onNameSelect(name);
-            }}
-          >
-            {is_folder ? (
-              <Folder className="w-4 h-4 shrink-0" />
-            ) : (
-              <File className="w-4 h-4 shrink-0" />
-            )}
-            <FileName name={name} className="w-full" />
-          </Button>
-        </div>
+      {dirs.map((dir) => (
+        <DirPanelItem side={side} item={dir} key={dir.full_path} />
       ))}
 
       {scrollToTop ? (

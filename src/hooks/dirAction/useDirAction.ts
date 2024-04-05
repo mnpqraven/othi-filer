@@ -4,6 +4,7 @@ import {
   type UseMutationOptions,
   useMutation,
   useQuery,
+  type UseQueryOptions,
 } from "@tanstack/react-query";
 import {
   type ListDirOut,
@@ -13,7 +14,15 @@ import {
 } from "@/bindings/taurpc";
 import { createRpc } from "@/bindings";
 
-export function useList(opt: ListDirIn) {
+export function useList(
+  opt: ListDirIn,
+  queryOpt?: UseQueryOptions<
+    ListDirOut,
+    Error,
+    ListDirOut,
+    (string | ListDirIn)[]
+  >,
+) {
   return useQuery({
     queryKey: ["listdir", opt],
     queryFn: async () => {
@@ -22,6 +31,7 @@ export function useList(opt: ListDirIn) {
       return res;
     },
     enabled: Boolean(opt.path),
+    ...queryOpt,
   });
 }
 

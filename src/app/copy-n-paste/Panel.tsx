@@ -1,7 +1,7 @@
 "use client";
 
 import { FolderOpen } from "lucide-react";
-import { type HTMLAttributes, forwardRef, useEffect, useState } from "react";
+import { type HTMLAttributes, forwardRef, useEffect } from "react";
 import { open } from "@tauri-apps/api/dialog";
 import { useAtom } from "jotai";
 import { Button } from "@/components/ui/button";
@@ -21,13 +21,15 @@ export const Panel = forwardRef<HTMLDivElement, Prop>(function Panel(
   { panelType: side, children: _children, className, ...props },
   ref,
 ) {
-  const [hidden, setHidden] = useState(false);
-
   const [panelConfig, updateConfig] = useAtom(copyPanelDispatchAtom);
-  const path = panelConfig[side].path ?? "";
+  const currentConf = panelConfig[side];
+  const path = currentConf.path ?? "";
 
   const { data: homeData } = useHomeDir();
-  const { data: listData } = useList({ path, show_hidden: hidden });
+  const { data: listData } = useList({
+    path,
+    show_hidden: currentConf.show_hidden,
+  });
 
   const { mutate: back } = useBack({
     onSuccess({ path }) {
@@ -57,7 +59,8 @@ export const Panel = forwardRef<HTMLDivElement, Prop>(function Panel(
 
   return (
     <div className={cn("flex flex-col gap-2", className)} {...props} ref={ref}>
-      <Input value={path} readOnly />
+      <Input value={path} readOnly className="shrink-0" />
+
       <div className="flex justify-between">
         <Button variant="outline" className="p-2.5" onClick={openFolderSelect}>
           <FolderOpen className="h-5 w-5" />
@@ -66,14 +69,20 @@ export const Panel = forwardRef<HTMLDivElement, Prop>(function Panel(
         <div className="flex items-center space-x-2">
           <Checkbox
             id="hidden"
+            checked={currentConf.show_hidden}
             onCheckedChange={(checked) => {
-              setHidden(checked === "indeterminate" ? false : checked);
+              const to = checked === "indeterminate" ? false : checked;
+              updateConfig({
+                type: "setHidden",
+                payload: { side, to },
+              });
             }}
           />
           <Label htmlFor="hidden">Hidden Files</Label>
         </div>
       </div>
       <DirPanel
+        side={side}
         dirs={listData?.children ?? []}
         onBack={() => {
           back({ path });

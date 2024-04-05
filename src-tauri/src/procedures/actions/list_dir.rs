@@ -21,6 +21,7 @@ pub struct ListDirOut {
 #[taurpc::ipc_type]
 struct DirItem {
     name: String,
+    full_path: String,
     is_folder: bool,
 }
 
@@ -43,8 +44,10 @@ pub async fn list_dir(params: ListDirIn) -> Result<ListDirOut, String> {
         })
         .map(|disk_entry| {
             let is_folder = metadata(disk_entry.path.clone()).unwrap().is_dir();
+            let full_path = disk_entry.path.to_str().unwrap().to_owned();
             DirItem {
                 name: disk_entry.name.clone().unwrap_or_default(),
+                full_path,
                 is_folder,
             }
         })

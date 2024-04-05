@@ -15,6 +15,7 @@ pub trait DirAction {
     async fn back(params: BackIn) -> Result<ListDirOut, String>;
 }
 
+/// TODO: manage state
 #[derive(Clone)]
 pub struct DirActionImpl;
 
