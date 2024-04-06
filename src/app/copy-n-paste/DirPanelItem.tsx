@@ -1,95 +1,120 @@
-import { useAtom } from "jotai";
 import { Folder, File, ArrowDownRight, ArrowDown } from "lucide-react";
-import { type HTMLAttributes, forwardRef, useState } from "react";
+import { type HTMLAttributes } from "react";
+import { useAtomValue } from "jotai";
 import { type DirItem } from "@/bindings/taurpc";
 import { FileName } from "@/components/FileName";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useForward, useList } from "@/hooks/dirAction/useDirAction";
+import {
+  useForward,
+  useListDir,
+  usePanelConfig,
+  useSelect,
+  useToggleExpand,
+} from "@/hooks/dirAction/useDirAction";
 import { cn } from "@/lib/utils";
-import { copyPanelDispatchAtom } from "./_store";
+import { panelSideAtom } from "./_store";
 
 interface Prop extends HTMLAttributes<HTMLDivElement> {
-  side: "left" | "right";
-  item: DirItem;
+  dirItem: DirItem;
 }
 
-export const DirPanelItem = forwardRef<HTMLDivElement, Prop>(
-  function DirPanelItem({ item, side, className, ...props }, ref) {
-    const { name, is_folder } = item;
-    const [panelConfig, updateConfig] = useAtom(copyPanelDispatchAtom);
-    const [expanded, setExpanded] = useState(false);
+/**
+ * NOTE: this component should be `forwardRef`, recursion will cause crashing by using the same ref
+ */
+export function DirPanelItem({ dirItem, className, ...props }: Prop) {
+  const side = useAtomValue(panelSideAtom);
+  const { data: panelState } = usePanelConfig({ side });
 
-    const { data: subDirs } = useList(
-      {
-        show_hidden: panelConfig[side].show_hidden,
-        path: item.full_path,
-      },
-      { enabled: expanded },
-    );
-    console.log(subDirs);
+  const dirIsExpanded = Boolean(
+    panelState?.expanded_paths.find((e) => e === dirItem.path),
+  );
+  const { data: listDirData } = useListDir(
+    { path: dirItem.path, show_hidden: panelState?.show_hidden },
+    { enabled: panelState?.show_hidden !== undefined && dirIsExpanded },
+  );
 
-    const { mutate: forward } = useForward({
-      onSuccess({ path }) {
-        updateConfig({ type: "setPath", payload: { side, to: path } });
-      },
-    });
+  return (
+    <>
+      <div
+        className={cn("flex cursor-pointer items-center gap-2", className)}
+        {...props}
+      >
+        <SelectButton {...dirItem} />
 
-    return (
-      <>
-        <div
-          className={cn("flex cursor-pointer items-center gap-2", className)}
-          {...props}
-          ref={ref}
-        >
-          <Checkbox
-          // onCheckedChange={(e) => {
-          //   if (onCheckboxSelect) {
-          //     if (e !== "indeterminate") onCheckboxSelect(name, e);
-          //     else onCheckboxSelect(name, false);
-          //   }
-          // }}
-          />
+        <ExpandButton {...dirItem} />
 
-          {is_folder ? (
-            <Button
-              variant="ghost"
-              className="p-0"
-              onClick={() => {
-                setExpanded(!expanded);
-              }}
-            >
-              {expanded ? <ArrowDown /> : <ArrowDownRight />}
-            </Button>
-          ) : null}
+        <FileMetaBlock {...dirItem} />
+      </div>
 
-          <Button
-            variant="ghost"
-            className="min-w-0 flex-1 justify-start gap-2 px-2 py-0 hover:underline"
-            onClick={() => {
-              if (is_folder) forward({ path: name, to_folder: name });
-            }}
-          >
-            {is_folder ? (
-              <Folder className="h-4 w-4 shrink-0" />
-            ) : (
-              <File className="h-4 w-4 shrink-0" />
-            )}
-            <FileName name={name} className="w-full" />
-          </Button>
+      {dirIsExpanded ? (
+        <div className="flex flex-col gap-2 pl-6">
+          {listDirData?.map((dir) => (
+            <DirPanelItem dirItem={dir} key={dir.path} />
+          ))}
         </div>
+      ) : null}
+    </>
+  );
+}
 
-        {expanded ? (
-          <div className="flex flex-col gap-2">
-            {/* FIX: render crash
-                probably better to manage state from rust's side
-                */}
-            {/* {subDirs?.children.map((dir) => ( */}
-            {/*   <DirPanelItem side={side} item={dir} key={dir.full_path} /> */}
-            {/* ))} */}
-          </div>
-        ) : null}
-      </>
-    );
-  },
-);
+function SelectButton({ path }: DirItem) {
+  const { mutate } = useSelect();
+  const side = useAtomValue(panelSideAtom);
+
+  return (
+    <Checkbox
+      onCheckedChange={(e) => {
+        const selected = e === "indeterminate" ? false : e;
+        mutate({ side, path, selected });
+      }}
+    />
+  );
+}
+
+function ExpandButton({ is_folder, path }: DirItem) {
+  const { mutate: toggleExpand } = useToggleExpand();
+  const side = useAtomValue(panelSideAtom);
+  const { data: panelState } = usePanelConfig({ side });
+
+  const expanded = Boolean(panelState?.expanded_paths.find((e) => e === path));
+
+  if (!is_folder) return null;
+  return (
+    <Button
+      variant="ghost"
+      className="p-0"
+      onClick={() => {
+        toggleExpand({
+          folder_path: path,
+          side,
+          expanded: !expanded,
+        });
+      }}
+    >
+      {expanded ? <ArrowDown /> : <ArrowDownRight />}
+    </Button>
+  );
+}
+
+function FileMetaBlock(item: DirItem) {
+  const { is_folder, path, short_path } = item;
+  const { mutate } = useForward();
+  const side = useAtomValue(panelSideAtom);
+  return (
+    <Button
+      variant="ghost"
+      className="min-w-0 flex-1 justify-start gap-2 px-2 py-0 hover:underline"
+      onClick={() => {
+        if (is_folder) mutate({ side, to: path });
+      }}
+    >
+      {is_folder ? (
+        <Folder className="h-4 w-4 shrink-0" />
+      ) : (
+        <File className="h-4 w-4 shrink-0" />
+      )}
+      <FileName path={short_path} className="w-full" />
+    </Button>
+  );
+}

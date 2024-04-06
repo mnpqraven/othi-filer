@@ -1,16 +1,17 @@
+use super::actions::{types::DirActionState, AppStateArc};
+
 pub mod home;
 
 #[taurpc::procedures(path = "data", export_to = "../src/bindings/taurpc.ts")]
 pub trait Data {
-    async fn home_dir() -> Result<String, String>;
+    async fn get_state() -> Result<DirActionState, String>;
 }
 
-#[derive(Clone)]
-pub struct DataImpl;
-
 #[taurpc::resolvers]
-impl Data for DataImpl {
-    async fn home_dir(self) -> Result<String, String> {
-        home::home_dir().await
+impl Data for AppStateArc {
+    async fn get_state(self) -> Result<DirActionState, String> {
+        let state = self.state.lock().await;
+        dbg!(state.clone().left.current_pointer_path);
+        Ok(state.clone())
     }
 }

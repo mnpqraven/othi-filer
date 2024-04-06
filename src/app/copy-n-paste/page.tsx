@@ -1,7 +1,11 @@
+"use client";
+
+import { Provider } from "jotai";
 import { SidebarThumb } from "@/components/SidebarThumb";
 import { MenuTopbar } from "@/components/MenuTopbar";
 import { Panel } from "./Panel";
 import { MiddleActionRow } from "./MiddleActionRow";
+import { leftPanelStore, rightPanelStore } from "./_store";
 
 /**
  * TODO:
@@ -18,11 +22,15 @@ export default function Page() {
       </div>
 
       <div className="flex justify-center gap-4 min-h-0 h-full">
-        <Panel panelType="left" className="w-5/12" />
+        <Provider store={leftPanelStore}>
+          <Panel className="w-5/12" />
+        </Provider>
 
         <MiddleActionRow className="grow-0 self-center" />
 
-        <Panel panelType="right" className="w-5/12" />
+        <Provider store={rightPanelStore}>
+          <Panel className="w-5/12" />
+        </Provider>
       </div>
     </div>
   );

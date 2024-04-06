@@ -27,6 +27,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "src/app/copy-n-paste/DirContainer.tsx"  ],
   "exclude": [ "node_modules", "src-tauri", "src/bindings.ts" ]
 }

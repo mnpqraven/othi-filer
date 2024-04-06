@@ -9,7 +9,8 @@ use tauri::Manager;
 
 #[tokio::main]
 async fn main() {
-    let router = create_router();
+    // TODO: make unwrap safe
+    let router = create_router().await.unwrap();
 
     tauri::Builder::default()
         .invoke_handler(router.into_handler())

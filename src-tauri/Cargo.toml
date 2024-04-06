@@ -21,6 +21,8 @@ tauri = { version = "1.6.1", features = [ "os-all", "notification-all", "dialog-
 taurpc = "0.2.4"
 specta = { version = "1.0.5", features = ["export"] }
 tokio = { version = "1", features = ["full"] }
+use = "0.0.1-pre.0"
+recursive_reference = "0.3.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

@@ -1,4 +1,4 @@
-pub async fn home_dir() -> Result<String, String> {
+pub fn home_dir() -> Result<String, String> {
     let dir = tauri::api::path::home_dir();
 
     match dir {
