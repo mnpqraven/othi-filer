@@ -26,7 +26,6 @@ pub fn list_dir(path: impl AsRef<Path>, show_hidden: bool) -> Result<Vec<DirItem
                 path: path.clone(),
                 // TODO: actual short path
                 short_path: path,
-                ..Default::default()
             }
         })
         .collect();

@@ -1,7 +1,9 @@
 #![allow(non_snake_case)]
 
-use self::actions::{FileAction, UIAction};
-use self::data::Data;
+use self::{
+    actions::{file::FileAction, ui::UIAction},
+    data::Data,
+};
 use crate::common::AppStateArc;
 use taurpc::Router;
 

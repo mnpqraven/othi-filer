@@ -95,9 +95,6 @@ pub struct DirItem {
     // the truncated path of the current panel
     pub short_path: String,
     pub is_folder: bool,
-    pub is_selected: bool,
-    // if this is expanded on the frontend
-    // is_expanded: bool,
 }
 
 impl DirItem {

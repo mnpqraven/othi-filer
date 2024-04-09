@@ -2,8 +2,7 @@ use super::types::{
     CopyUiState, DirActionPanel, SelectRequest, ToggleExpandRequest, ToggleHiddenRequest,
     UpdatePathRequest,
 };
-use super::AppStateArc;
-use crate::common::error::AppErrorIpc;
+use crate::common::{error::AppErrorIpc, AppStateArc};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
