@@ -10,7 +10,7 @@ import {
   useBack,
   useListDir,
   usePanelConfig,
-} from "@/hooks/dirAction/useDirAction";
+} from "@/hooks/dirAction/useUIAction";
 import { DirPanelItem } from "./DirPanelItem";
 import { panelSideAtom } from "./_store";
 

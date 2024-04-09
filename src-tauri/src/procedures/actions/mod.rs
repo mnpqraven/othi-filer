@@ -1,12 +1,10 @@
 use self::{
-    list_dir::list_dir,
     reducer::{dispatch_action, DirActionSchema, Side},
     types::{
-        CopyUiState, DirActionPanel, DirItem, ListDirRequest, SelectRequest, ToggleExpandRequest,
+        CopyUiState, DirItem, ListDirRequest, SelectRequest, ToggleExpandRequest,
         ToggleHiddenRequest, UpdatePathRequest,
     },
 };
-use super::data::home::home_dir;
 use crate::common::{error::AppErrorIpc, AppStateArc};
 use std::path::Path;
 
@@ -16,7 +14,7 @@ pub mod list_dir;
 pub mod reducer;
 pub mod types;
 
-#[taurpc::procedures(path = "actions", export_to = "../src/bindings/taurpc.ts")]
+#[taurpc::procedures(path = "actions.ui", export_to = "../src/bindings/taurpc.ts")]
 pub trait UIAction {
     async fn list_dir(params: ListDirRequest) -> Result<Vec<DirItem>, AppErrorIpc>;
     async fn toggle_expand(params: ToggleExpandRequest) -> Result<CopyUiState, AppErrorIpc>;
@@ -26,25 +24,6 @@ pub trait UIAction {
     async fn back(params: Side) -> Result<CopyUiState, AppErrorIpc>;
     async fn select(params: SelectRequest) -> Result<CopyUiState, AppErrorIpc>;
     async fn swap_sides() -> Result<CopyUiState, AppErrorIpc>;
-}
-
-impl CopyUiState {
-    pub async fn new() -> Result<Self, String> {
-        let home_path = home_dir().unwrap();
-        let default_panel: DirActionPanel = DirActionPanel {
-            root_path: home_path.clone(),
-            current_pointer_path: home_path.clone(),
-            show_hidden: false,
-            items: list_dir(&home_path, false).unwrap(),
-            selected_items: vec![],
-            expanded_paths: vec![],
-        };
-
-        Ok(Self {
-            left: default_panel.clone(),
-            right: default_panel.clone(),
-        })
-    }
 }
 
 #[taurpc::resolvers]
@@ -84,5 +63,17 @@ impl UIAction for AppStateArc {
 
     async fn swap_sides(self) -> Result<CopyUiState, AppErrorIpc> {
         dispatch_action(self, DirActionSchema::SwapSides).await
+    }
+}
+
+#[taurpc::procedures(path = "actions.file", export_to = "../src/bindings/taurpc.ts")]
+pub trait FileAction {
+    async fn copy() -> Result<(), AppErrorIpc>;
+}
+
+#[taurpc::resolvers]
+impl FileAction for AppStateArc {
+    async fn copy(self) -> Result<(), AppErrorIpc> {
+        Ok(())
     }
 }

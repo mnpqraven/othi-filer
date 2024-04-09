@@ -11,7 +11,7 @@ import {
   usePanelConfig,
   useSelect,
   useToggleExpand,
-} from "@/hooks/dirAction/useDirAction";
+} from "@/hooks/dirAction/useUIAction";
 import { cn } from "@/lib/utils";
 import { panelSideAtom } from "./_store";
 

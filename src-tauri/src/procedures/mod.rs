@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use self::actions::UIAction;
+use self::actions::{FileAction, UIAction};
 use self::data::Data;
 use crate::common::AppStateArc;
 use taurpc::Router;
@@ -30,5 +30,6 @@ pub async fn create_router() -> Result<Router, String> {
     Ok(Router::new()
         .merge(ApiImpl.into_handler())
         .merge(Data::into_handler(initial_state.clone()))
-        .merge(UIAction::into_handler(initial_state)))
+        .merge(UIAction::into_handler(initial_state.clone()))
+        .merge(FileAction::into_handler(initial_state)))
 }

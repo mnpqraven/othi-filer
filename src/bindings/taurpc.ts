@@ -2,39 +2,43 @@
 
 export type TauRpcApiInputTypes = { proc_name: "hello_world"; input_type: null }
 
-export type Side = "left" | "right"
-
-export type ToggleHiddenRequest = { side: Side; to: boolean }
-
-export type ListDirOut = { path: string; short_path: string; children: DirItem[] }
-
 export type DirActionPanel = { root_path: string; current_pointer_path: string; show_hidden: boolean; items: DirItem[]; expanded_paths: string[]; selected_items: string[] }
 
-export type TauRpcDataInputTypes = { proc_name: "get_state"; input_type: null }
+export type TauRpcUIActionInputTypes = { proc_name: "list_dir"; input_type: { __taurpc_type: ListDirRequest } } | { proc_name: "toggle_expand"; input_type: { __taurpc_type: ToggleExpandRequest } } | { proc_name: "toggle_hidden"; input_type: { __taurpc_type: ToggleHiddenRequest } } | { proc_name: "update_cursor_path"; input_type: { __taurpc_type: UpdatePathRequest } } | { proc_name: "forward"; input_type: { __taurpc_type: UpdatePathRequest } } | { proc_name: "back"; input_type: { __taurpc_type: Side } } | { proc_name: "select"; input_type: { __taurpc_type: SelectRequest } } | { proc_name: "swap_sides"; input_type: null }
 
 export type AppErrorIpc = { kind: string; message: string }
 
 export type TauRpcApiOutputTypes = { proc_name: "hello_world"; output_type: null }
 
-export type TauRpcDirActionInputTypes = { proc_name: "list_dir"; input_type: { __taurpc_type: ListDirRequest } } | { proc_name: "toggle_expand"; input_type: { __taurpc_type: ToggleExpandRequest } } | { proc_name: "toggle_hidden"; input_type: { __taurpc_type: ToggleHiddenRequest } } | { proc_name: "update_cursor_path"; input_type: { __taurpc_type: UpdatePathRequest } } | { proc_name: "forward"; input_type: { __taurpc_type: UpdatePathRequest } } | { proc_name: "back"; input_type: { __taurpc_type: Side } } | { proc_name: "select"; input_type: { __taurpc_type: SelectRequest } } | { proc_name: "swap_sides"; input_type: null } | { proc_name: "trigger_error"; input_type: null }
+export type TauRpcDataOutputTypes = { proc_name: "get_state"; output_type: CopyUiState }
 
-export type TauRpcDataOutputTypes = { proc_name: "get_state"; output_type: DirActionState }
+export type TauRpcFileActionOutputTypes = { proc_name: "copy"; output_type: null }
+
+export type UpdatePathRequest = { side: Side; to: string }
 
 export type ListDirRequest = { path: string; show_hidden: boolean }
+
+export type Side = "left" | "right"
+
+export type ListDirOut = { path: string; short_path: string; children: DirItem[] }
+
+export type DirItem = { path: string; short_path: string; is_folder: boolean; is_selected: boolean }
+
+export type TauRpcDataInputTypes = { proc_name: "get_state"; input_type: null }
+
+export type ToggleHiddenRequest = { side: Side; to: boolean }
+
+export type TauRpcFileActionInputTypes = { proc_name: "copy"; input_type: null }
+
+export type CopyUiState = { left: DirActionPanel; right: DirActionPanel }
 
 export type ToggleExpandRequest = { side: Side; folder_path: string; expanded: boolean }
 
 export type SelectRequest = { side: Side; path: string; selected: boolean }
 
-export type DirActionState = { left: DirActionPanel; right: DirActionPanel }
+export type TauRpcUIActionOutputTypes = { proc_name: "list_dir"; output_type: DirItem[] } | { proc_name: "toggle_expand"; output_type: CopyUiState } | { proc_name: "toggle_hidden"; output_type: CopyUiState } | { proc_name: "update_cursor_path"; output_type: CopyUiState } | { proc_name: "forward"; output_type: CopyUiState } | { proc_name: "back"; output_type: CopyUiState } | { proc_name: "select"; output_type: CopyUiState } | { proc_name: "swap_sides"; output_type: CopyUiState }
 
-export type TauRpcDirActionOutputTypes = { proc_name: "list_dir"; output_type: DirItem[] } | { proc_name: "toggle_expand"; output_type: DirActionState } | { proc_name: "toggle_hidden"; output_type: DirActionState } | { proc_name: "update_cursor_path"; output_type: DirActionState } | { proc_name: "forward"; output_type: DirActionState } | { proc_name: "back"; output_type: DirActionState } | { proc_name: "select"; output_type: DirActionState } | { proc_name: "swap_sides"; output_type: DirActionState } | { proc_name: "trigger_error"; output_type: null }
-
-export type UpdatePathRequest = { side: Side; to: string }
-
-export type DirItem = { path: string; short_path: string; is_folder: boolean; is_selected: boolean }
-
-const ARGS_MAP = {"":"{\"hello_world\":[]}","data":"{\"get_state\":[]}","actions":"{\"list_dir\":[\"params\"],\"swap_sides\":[],\"trigger_error\":[],\"select\":[\"params\"],\"back\":[\"params\"],\"toggle_expand\":[\"params\"],\"toggle_hidden\":[\"params\"],\"forward\":[\"params\"],\"update_cursor_path\":[\"params\"]}"}
+const ARGS_MAP = {"actions.file":"{\"copy\":[]}","actions.ui":"{\"forward\":[\"params\"],\"update_cursor_path\":[\"params\"],\"toggle_hidden\":[\"params\"],\"swap_sides\":[],\"toggle_expand\":[\"params\"],\"list_dir\":[\"params\"],\"back\":[\"params\"],\"select\":[\"params\"]}","":"{\"hello_world\":[]}","data":"{\"get_state\":[]}"}
 import { createTauRPCProxy as createProxy } from "taurpc"
 
 export const createTauRPCProxy = () => createProxy<Router>(ARGS_MAP)
@@ -42,5 +46,6 @@ export const createTauRPCProxy = () => createProxy<Router>(ARGS_MAP)
 type Router = {
 	'': [TauRpcApiInputTypes, TauRpcApiOutputTypes],
 	'data': [TauRpcDataInputTypes, TauRpcDataOutputTypes],
-	'actions': [TauRpcDirActionInputTypes, TauRpcDirActionOutputTypes],
+	'actions.ui': [TauRpcUIActionInputTypes, TauRpcUIActionOutputTypes],
+	'actions.file': [TauRpcFileActionInputTypes, TauRpcFileActionOutputTypes],
 }

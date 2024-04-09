@@ -1,10 +1,30 @@
-use super::reducer::Side;
+use super::{list_dir::list_dir, reducer::Side};
+use crate::procedures::data::home::home_dir;
 
 #[derive(Debug)]
 #[taurpc::ipc_type]
 pub struct CopyUiState {
     pub left: DirActionPanel,
     pub right: DirActionPanel,
+}
+
+impl CopyUiState {
+    pub async fn new() -> Result<Self, String> {
+        let home_path = home_dir().unwrap();
+        let default_panel: DirActionPanel = DirActionPanel {
+            root_path: home_path.clone(),
+            current_pointer_path: home_path.clone(),
+            show_hidden: false,
+            items: list_dir(&home_path, false).unwrap(),
+            selected_items: vec![],
+            expanded_paths: vec![],
+        };
+
+        Ok(Self {
+            left: default_panel.clone(),
+            right: default_panel.clone(),
+        })
+    }
 }
 
 #[derive(Debug)]
