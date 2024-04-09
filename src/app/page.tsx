@@ -9,9 +9,10 @@ interface LinkItem {
 export default function LandingPage() {
   const links: LinkItem[] = [
     { href: "/copy-n-paste", title: "Copy & Paste", description: "ree" },
+    { href: "/test", title: "Test", description: "test playground" },
   ];
   return (
-    <div className="grid grid-cols-2 p-8">
+    <div className="grid grid-cols-2 gap-4 p-8">
       {links.map((link) => (
         <LinkItem key={link.href} {...link} />
       ))}

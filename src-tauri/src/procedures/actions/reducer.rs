@@ -5,6 +5,7 @@ use super::types::{
     UpdatePathRequest,
 };
 use super::AppStateArc;
+use crate::common::error::AppErrorIpc;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize, specta::Type, Debug)]
@@ -27,7 +28,7 @@ pub enum DirActionSchema {
 pub async fn dispatch_action(
     guard: AppStateArc,
     action: DirActionSchema,
-) -> Result<DirActionState, String> {
+) -> Result<DirActionState, AppErrorIpc> {
     let mut state = guard.state.lock().await;
 
     match action {

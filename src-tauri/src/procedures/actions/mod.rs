@@ -1,8 +1,8 @@
+use crate::common::error::{AppError, AppErrorIpc};
+
 /// this module manages the copy-n-paste dir for now
 ///
 use self::{
-    // back::BackIn,
-    // forward::ForwardIn,
     list_dir::list_dir,
     reducer::{dispatch_action, DirActionSchema, Side},
     types::{
@@ -15,7 +15,6 @@ use tokio::sync::Mutex;
 
 use super::data::home::home_dir;
 
-pub mod back;
 pub mod list_dir;
 pub mod reducer;
 pub mod types;
@@ -24,13 +23,14 @@ pub mod types;
 pub trait DirAction {
     // TODO: move this to data (try using a diffenrt trait but same impl (DirActionImpl) to share state)
     // async fn tree_state() -> Result<DirActionState, String>;
-    async fn list_dir(params: ListDirRequest) -> Result<Vec<DirItem>, String>;
-    async fn toggle_expand(params: ToggleExpandRequest) -> Result<DirActionState, String>;
-    async fn toggle_hidden(params: ToggleHiddenRequest) -> Result<DirActionState, String>;
-    async fn update_cursor_path(params: UpdatePathRequest) -> Result<DirActionState, String>;
-    async fn forward(params: UpdatePathRequest) -> Result<DirActionState, String>;
-    async fn back(params: Side) -> Result<DirActionState, String>;
-    async fn select(params: SelectRequest) -> Result<DirActionState, String>;
+    async fn list_dir(params: ListDirRequest) -> Result<Vec<DirItem>, AppErrorIpc>;
+    async fn toggle_expand(params: ToggleExpandRequest) -> Result<DirActionState, AppErrorIpc>;
+    async fn toggle_hidden(params: ToggleHiddenRequest) -> Result<DirActionState, AppErrorIpc>;
+    async fn update_cursor_path(params: UpdatePathRequest) -> Result<DirActionState, AppErrorIpc>;
+    async fn forward(params: UpdatePathRequest) -> Result<DirActionState, AppErrorIpc>;
+    async fn back(params: Side) -> Result<DirActionState, AppErrorIpc>;
+    async fn select(params: SelectRequest) -> Result<DirActionState, AppErrorIpc>;
+    async fn trigger_error() -> Result<(), AppErrorIpc>;
 }
 
 /// TODO: manage state
@@ -76,34 +76,38 @@ impl DirAction for AppStateArc {
     //     Ok(state)
     // }
 
-    async fn list_dir(self, params: ListDirRequest) -> Result<Vec<DirItem>, String> {
+    async fn list_dir(self, params: ListDirRequest) -> Result<Vec<DirItem>, AppErrorIpc> {
         let ListDirRequest { path, show_hidden } = params;
         let path = Path::new(&path);
         list_dir::list_dir(path, show_hidden)
     }
 
     /// needs alot of work with recursion
-    async fn toggle_expand(self, params: ToggleExpandRequest) -> Result<DirActionState, String> {
+    async fn toggle_expand(self, params: ToggleExpandRequest) -> Result<DirActionState, AppErrorIpc> {
         dispatch_action(self, DirActionSchema::ToggleExpand(params)).await
     }
 
-    async fn toggle_hidden(self, params: ToggleHiddenRequest) -> Result<DirActionState, String> {
+    async fn toggle_hidden(self, params: ToggleHiddenRequest) -> Result<DirActionState, AppErrorIpc> {
         dispatch_action(self, DirActionSchema::ToggleHidden(params)).await
     }
 
-    async fn update_cursor_path(self, params: UpdatePathRequest) -> Result<DirActionState, String> {
+    async fn update_cursor_path(self, params: UpdatePathRequest) -> Result<DirActionState, AppErrorIpc> {
         dispatch_action(self, DirActionSchema::UpdateCursorPath(params)).await
     }
 
-    async fn forward(self, params: UpdatePathRequest) -> Result<DirActionState, String> {
+    async fn forward(self, params: UpdatePathRequest) -> Result<DirActionState, AppErrorIpc> {
         dispatch_action(self, DirActionSchema::Forward(params)).await
     }
 
-    async fn back(self, params: Side) -> Result<DirActionState, String> {
+    async fn back(self, params: Side) -> Result<DirActionState, AppErrorIpc> {
         dispatch_action(self, DirActionSchema::Back(params)).await
     }
 
-    async fn select(self, params: SelectRequest) -> Result<DirActionState, String> {
+    async fn select(self, params: SelectRequest) -> Result<DirActionState, AppErrorIpc> {
         dispatch_action(self, DirActionSchema::Select(params)).await
+    }
+
+    async fn trigger_error(self) -> Result<(), AppErrorIpc> {
+        Err(AppError::GenericError("bruh error".into()).into())
     }
 }

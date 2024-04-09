@@ -1,15 +1,16 @@
 #![allow(non_snake_case)]
 
-use crate::utils::metadata::is_hidden;
-
 use super::types::DirItem;
+use crate::{
+    common::error::{AppError, AppErrorIpc},
+    utils::metadata::is_hidden,
+};
 use std::{fs::metadata, path::Path};
 use tauri::api::dir::read_dir;
 
-pub fn list_dir(path: impl AsRef<Path>, show_hidden: bool) -> Result<Vec<DirItem>, String> {
-    let dirs = match read_dir(path.as_ref(), false) {
-        Ok(a) => a,
-        Err(_) => vec![],
+pub fn list_dir(path: impl AsRef<Path>, show_hidden: bool) -> Result<Vec<DirItem>, AppErrorIpc> {
+    let Ok(dirs) = read_dir(path.as_ref(), false) else {
+        return Err(AppError::GenericError("Cannot read the specified path".into()).into());
     };
     let children: Vec<DirItem> = dirs
         .iter()

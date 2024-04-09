@@ -10,11 +10,22 @@ import {
   type QueryClientConfig,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { type AppErrorIpc } from "@/bindings/taurpc";
 import { ProcessEventHandlers } from "./eventHandlers";
 
 const TANSTACK_CONFIG: QueryClientConfig = {
   defaultOptions: {
     queries: { refetchOnWindowFocus: false },
+    mutations: {
+      onError(error) {
+        // safe hardcast as soon as rust' error struct remains unchanged
+        const { kind, message } = error as unknown as AppErrorIpc;
+        toast.error(kind, {
+          description: message,
+        });
+      },
+    },
   },
 };
 

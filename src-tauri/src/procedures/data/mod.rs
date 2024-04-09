@@ -11,7 +11,6 @@ pub trait Data {
 impl Data for AppStateArc {
     async fn get_state(self) -> Result<DirActionState, String> {
         let state = self.state.lock().await;
-        dbg!(state.clone().left.current_pointer_path);
         Ok(state.clone())
     }
 }
