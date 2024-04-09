@@ -54,7 +54,11 @@ export function Panel({ className, ...props }: Prop) {
         </div>
       </div>
       {panelState.current_pointer_path ? (
-        <DirContainer cursorPath={current_pointer_path} scrollToTop />
+        <DirContainer
+          cursorPath={current_pointer_path}
+          scrollToTop
+          className="flex-1"
+        />
       ) : null}
     </div>
   );

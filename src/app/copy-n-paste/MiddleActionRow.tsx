@@ -2,17 +2,16 @@
 
 import { ArrowRightLeft } from "lucide-react";
 import { type HTMLAttributes, forwardRef } from "react";
-import { useSetAtom } from "jotai";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { copyPanelDispatchAtom } from "./_store";
+import { useSwapSides } from "@/hooks/dirAction/useDirAction";
 
 interface Prop extends HTMLAttributes<HTMLDivElement> {
   hello?: "world";
 }
 export const MiddleActionRow = forwardRef<HTMLDivElement, Prop>(
   function MiddleActionRow({ className, ...props }, ref) {
-    const updateConfig = useSetAtom(copyPanelDispatchAtom);
+    const { mutate: swapSide } = useSwapSides();
 
     return (
       <div {...props} ref={ref} className={cn("", className)}>
@@ -20,7 +19,7 @@ export const MiddleActionRow = forwardRef<HTMLDivElement, Prop>(
           variant="outline"
           className="p-2.5"
           onClick={() => {
-            updateConfig({ type: "swapSide", payload: null });
+            swapSide();
           }}
         >
           <ArrowRightLeft />

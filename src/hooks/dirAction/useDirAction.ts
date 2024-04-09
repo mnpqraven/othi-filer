@@ -57,12 +57,12 @@ export function useListDir(
     queryKey: ["actions", "list_dir", { path, show_hidden }],
     queryFn: path
       ? async () => {
-          const r = await createRpc();
-          return await r.actions.list_dir({
-            path,
-            show_hidden: show_hidden ?? false,
-          });
-        }
+        const r = await createRpc();
+        return await r.actions.list_dir({
+          path,
+          show_hidden: show_hidden ?? false,
+        });
+      }
       : skipToken,
     placeholderData: keepPreviousData,
   });
@@ -135,6 +135,18 @@ export function useSelect() {
     mutationFn: async (params: SelectRequest) => {
       const r = await createRpc();
       return await r.actions.select(params);
+    },
+    onSuccess: update,
+  });
+}
+
+export function useSwapSides() {
+  const { update } = useUpdateState();
+  return useMutation({
+    mutationKey: ["actions", "swap_sides"],
+    mutationFn: async () => {
+      const r = await createRpc();
+      return await r.actions.swap_sides();
     },
     onSuccess: update,
   });

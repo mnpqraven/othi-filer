@@ -30,6 +30,7 @@ pub trait DirAction {
     async fn forward(params: UpdatePathRequest) -> Result<DirActionState, AppErrorIpc>;
     async fn back(params: Side) -> Result<DirActionState, AppErrorIpc>;
     async fn select(params: SelectRequest) -> Result<DirActionState, AppErrorIpc>;
+    async fn swap_sides() -> Result<DirActionState, AppErrorIpc>;
     async fn trigger_error() -> Result<(), AppErrorIpc>;
 }
 
@@ -105,6 +106,10 @@ impl DirAction for AppStateArc {
 
     async fn select(self, params: SelectRequest) -> Result<DirActionState, AppErrorIpc> {
         dispatch_action(self, DirActionSchema::Select(params)).await
+    }
+
+    async fn swap_sides(self) -> Result<DirActionState, AppErrorIpc> {
+        dispatch_action(self, DirActionSchema::SwapSides).await
     }
 
     async fn trigger_error(self) -> Result<(), AppErrorIpc> {

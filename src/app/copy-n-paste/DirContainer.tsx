@@ -35,7 +35,6 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
     if (!data) return "listdir loading...";
     return (
       <ScrollArea
-        id="ree"
         className={cn(
           "relative flex flex-col rounded-md border py-2 pl-3 pr-2.5",
           className,
@@ -58,6 +57,7 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
           <DirPanelItem dirItem={dir} key={dir.path} />
         ))}
 
+        {/* NOTE: better to mask this ? */}
         {scrollToTop ? (
           <Transition
             show={overThreshold}

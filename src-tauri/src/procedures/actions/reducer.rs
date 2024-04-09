@@ -23,6 +23,7 @@ pub enum DirActionSchema {
     ToggleExpand(ToggleExpandRequest),
     ToggleHidden(ToggleHiddenRequest),
     Select(SelectRequest),
+    SwapSides,
 }
 
 pub async fn dispatch_action(
@@ -96,6 +97,12 @@ pub async fn dispatch_action(
                 // rest noop
                 _ => {}
             }
+        }
+        DirActionSchema::SwapSides => {
+            let left_owned = state.left.clone();
+            let right_owned = state.right.clone();
+            state.left = right_owned;
+            state.right = left_owned;
         }
     }
 
