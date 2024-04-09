@@ -1,9 +1,9 @@
 #![allow(non_snake_case)]
 
-use taurpc::Router;
-
-use self::actions::{DirAction,  AppStateArc};
+use self::actions::UIAction;
 use self::data::Data;
+use crate::common::AppStateArc;
+use taurpc::Router;
 
 pub mod actions;
 pub mod data;
@@ -30,5 +30,5 @@ pub async fn create_router() -> Result<Router, String> {
     Ok(Router::new()
         .merge(ApiImpl.into_handler())
         .merge(Data::into_handler(initial_state.clone()))
-        .merge(DirAction::into_handler(initial_state)))
+        .merge(UIAction::into_handler(initial_state)))
 }

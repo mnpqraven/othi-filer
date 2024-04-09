@@ -2,7 +2,7 @@ use super::reducer::Side;
 
 #[derive(Debug)]
 #[taurpc::ipc_type]
-pub struct DirActionState {
+pub struct CopyUiState {
     pub left: DirActionPanel,
     pub right: DirActionPanel,
 }

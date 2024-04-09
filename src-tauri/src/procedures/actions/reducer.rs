@@ -1,12 +1,11 @@
-use std::path::PathBuf;
-
 use super::types::{
-    DirActionPanel, DirActionState, SelectRequest, ToggleExpandRequest, ToggleHiddenRequest,
+    CopyUiState, DirActionPanel, SelectRequest, ToggleExpandRequest, ToggleHiddenRequest,
     UpdatePathRequest,
 };
 use super::AppStateArc;
 use crate::common::error::AppErrorIpc;
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
 #[derive(Clone, Serialize, Deserialize, specta::Type, Debug)]
 #[serde(rename_all = "lowercase")]
@@ -29,7 +28,7 @@ pub enum DirActionSchema {
 pub async fn dispatch_action(
     guard: AppStateArc,
     action: DirActionSchema,
-) -> Result<DirActionState, AppErrorIpc> {
+) -> Result<CopyUiState, AppErrorIpc> {
     let mut state = guard.state.lock().await;
 
     match action {
@@ -110,7 +109,7 @@ pub async fn dispatch_action(
 }
 
 // TODO: move to utils.rs ?
-fn get_panel_mut(state: &mut DirActionState, side: Side) -> &mut DirActionPanel {
+fn get_panel_mut(state: &mut CopyUiState, side: Side) -> &mut DirActionPanel {
     match side {
         Side::Left => &mut state.left,
         Side::Right => &mut state.right,
@@ -118,7 +117,7 @@ fn get_panel_mut(state: &mut DirActionState, side: Side) -> &mut DirActionPanel 
 }
 
 #[allow(dead_code)]
-fn get_panel(state: &DirActionState, side: Side) -> &DirActionPanel {
+fn get_panel(state: &CopyUiState, side: Side) -> &DirActionPanel {
     match side {
         Side::Left => &state.left,
         Side::Right => &state.right,
