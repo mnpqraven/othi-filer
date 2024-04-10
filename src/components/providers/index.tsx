@@ -13,10 +13,11 @@ import {
 import { toast } from "sonner";
 import { type AppErrorIpc } from "@/bindings/taurpc";
 import { ProcessEventHandlers } from "./eventHandlers";
+import { TooltipProvider } from "../ui/tooltip";
 
 const TANSTACK_CONFIG: QueryClientConfig = {
   defaultOptions: {
-    queries: { refetchOnWindowFocus: false },
+    queries: { retry: false, refetchOnWindowFocus: false },
     mutations: {
       onError(error) {
         // safe hardcast as soon as rust' error struct remains unchanged
@@ -39,16 +40,18 @@ export function AppProvider({ children }: Prop) {
 
   return (
     <ProcessEventHandlers>
-      <ThemeProvider attribute="class">
-        <QueryClientProvider client={queryClient}>
-          <Provider>
-            {children}
+      <TooltipProvider delayDuration={300}>
+        <ThemeProvider attribute="class">
+          <QueryClientProvider client={queryClient}>
+            <Provider>
+              {children}
 
-            <DevTools theme="dark" />
-            <ReactQueryDevtools initialIsOpen={false} />
-          </Provider>
-        </QueryClientProvider>
-      </ThemeProvider>
+              <DevTools theme="dark" />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </Provider>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </TooltipProvider>
     </ProcessEventHandlers>
   );
 }

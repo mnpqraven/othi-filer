@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 
 use self::{
-    actions::{file::FileAction, ui::UIAction},
+    actions::{file::FileAction, ui::UIAction, ActionRoot, ActionRootImpl},
     data::Data,
 };
 use crate::common::AppStateArc;
@@ -32,6 +32,7 @@ pub async fn create_router() -> Result<Router, String> {
     Ok(Router::new()
         .merge(ApiImpl.into_handler())
         .merge(Data::into_handler(initial_state.clone()))
+        .merge(ActionRootImpl.into_handler())
         .merge(UIAction::into_handler(initial_state.clone()))
         .merge(FileAction::into_handler(initial_state)))
 }

@@ -30,7 +30,7 @@ export function DirPanelItem({ dirItem, className, ...props }: Prop) {
     panelState?.expanded_paths.find((e) => e === dirItem.path),
   );
   const { data: listDirData } = useListDir(
-    { path: dirItem.path, show_hidden: panelState?.show_hidden },
+    { path: dirItem.path, show_hidden: panelState?.show_hidden, side },
     { enabled: panelState?.show_hidden !== undefined && dirIsExpanded },
   );
 
@@ -105,7 +105,7 @@ function FileMetaBlock(item: DirItem) {
     <Button
       variant="ghost"
       className="min-w-0 flex-1 justify-start gap-2 px-2 py-0 hover:underline"
-      onClick={() => {
+      onDoubleClick={() => {
         if (is_folder) mutate({ side, to: path });
       }}
     >

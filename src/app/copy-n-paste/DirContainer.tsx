@@ -28,6 +28,7 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
     const { data } = useListDir({
       path: cursorPath,
       show_hidden: panelState?.show_hidden,
+      side,
     });
 
     const { mutate } = useBack();

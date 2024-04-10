@@ -15,7 +15,7 @@ impl CopyUiState {
             root_path: home_path.clone(),
             current_pointer_path: home_path.clone(),
             show_hidden: false,
-            items: list_dir(&home_path, false).unwrap(),
+            items: list_dir(&home_path, false, Some(&home_path)).unwrap(),
             selected_items: vec![],
             expanded_paths: vec![],
         };
@@ -67,6 +67,7 @@ pub struct UpdatePathRequest {
 pub struct ListDirRequest {
     pub path: String,
     pub show_hidden: bool,
+    pub side: Side,
 }
 
 #[taurpc::ipc_type]
@@ -95,6 +96,15 @@ pub struct DirItem {
     // the truncated path of the current panel
     pub short_path: String,
     pub is_folder: bool,
+    pub permissions: Option<DirPermission>,
+}
+
+#[derive(Default, Debug)]
+#[taurpc::ipc_type]
+pub struct DirPermission {
+    pub readable: bool,
+    pub writable: bool,
+    pub executable: bool,
 }
 
 impl DirItem {

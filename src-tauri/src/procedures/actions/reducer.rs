@@ -116,7 +116,7 @@ fn get_panel_mut(state: &mut CopyUiState, side: Side) -> &mut DirActionPanel {
 }
 
 #[allow(dead_code)]
-fn get_panel(state: &CopyUiState, side: Side) -> &DirActionPanel {
+pub fn get_panel(state: &CopyUiState, side: Side) -> &DirActionPanel {
     match side {
         Side::Left => &state.left,
         Side::Right => &state.right,

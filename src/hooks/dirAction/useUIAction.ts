@@ -21,7 +21,7 @@ import {
 } from "@/bindings/taurpc";
 import { createRpc } from "@/bindings";
 
-function useUpdateState() {
+export function useUpdateState() {
   const client = useQueryClient();
   const refetch = () =>
     client.refetchQueries({ queryKey: ["data", "app_state"] });
@@ -48,22 +48,25 @@ export function usePanelConfig(
 }
 
 export function useListDir(
-  { path, show_hidden }: Partial<ListDirRequest>,
+  { path, show_hidden, side }: Partial<ListDirRequest>,
   opt?: Partial<UseQueryOptions<DirItem[], Error, DirItem[]>>,
 ) {
   return useQuery({
-    enabled: Boolean(path?.length) && show_hidden !== undefined,
+    enabled:
+      Boolean(path?.length) && show_hidden !== undefined && Boolean(side),
     ...opt,
     queryKey: ["actions", "list_dir", { path, show_hidden }],
-    queryFn: path
-      ? async () => {
-          const r = await createRpc();
-          return await r.actions.ui.list_dir({
-            path,
-            show_hidden: show_hidden ?? false,
-          });
-        }
-      : skipToken,
+    queryFn:
+      path && side
+        ? async () => {
+            const r = await createRpc();
+            return await r.actions.ui.list_dir({
+              path,
+              show_hidden: show_hidden ?? false,
+              side,
+            });
+          }
+        : skipToken,
     placeholderData: keepPreviousData,
   });
 }

@@ -1,5 +1,5 @@
 use super::list_dir::list_dir;
-use super::reducer::Side;
+use super::reducer::{get_panel, Side};
 use super::types::{
     CopyUiState, DirItem, ListDirRequest, SelectRequest, ToggleExpandRequest, ToggleHiddenRequest,
     UpdatePathRequest,
@@ -23,9 +23,16 @@ pub trait UIAction {
 #[taurpc::resolvers]
 impl UIAction for AppStateArc {
     async fn list_dir(self, params: ListDirRequest) -> Result<Vec<DirItem>, AppErrorIpc> {
-        let ListDirRequest { path, show_hidden } = params;
+        let ListDirRequest {
+            path,
+            show_hidden,
+            side,
+        } = params;
         let path = Path::new(&path);
-        list_dir(path, show_hidden)
+
+        let state = self.state.lock().await;
+        let panel = get_panel(&state, side);
+        list_dir(path, show_hidden, Some(&panel.current_pointer_path))
     }
 
     async fn toggle_expand(self, params: ToggleExpandRequest) -> Result<CopyUiState, AppErrorIpc> {
