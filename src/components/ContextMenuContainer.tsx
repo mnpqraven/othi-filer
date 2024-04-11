@@ -1,9 +1,13 @@
+"use client";
+
 import { type ComponentPropsWithoutRef } from "react";
 import { type Side } from "@/bindings/taurpc";
+import { useUpdateState } from "@/hooks/dirAction/useUIAction";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "./ui/context-menu";
 
@@ -25,6 +29,8 @@ interface Prop extends ComponentPropsWithoutRef<typeof ContextMenuTrigger> {
   context?: ContextMap;
 }
 export function ContextMenuContainer({ context, children, ...props }: Prop) {
+  const { refetch } = useUpdateState();
+
   if (!context)
     return (
       <ContextMenu>
@@ -36,10 +42,13 @@ export function ContextMenuContainer({ context, children, ...props }: Prop) {
     <ContextMenu>
       <ContextMenuTrigger {...props}>{children}</ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem>Profile</ContextMenuItem>
-        <ContextMenuItem>Billing</ContextMenuItem>
-        <ContextMenuItem>Team</ContextMenuItem>
-        <ContextMenuItem>Subscription</ContextMenuItem>
+        <ContextMenuItem onSelect={refetch}>Refresh</ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem>Check All</ContextMenuItem>
+        <ContextMenuItem>Check selecteds by cursor</ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem>Uncheck All</ContextMenuItem>
+        <ContextMenuItem>Uncheck selecteds by cursor</ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   );

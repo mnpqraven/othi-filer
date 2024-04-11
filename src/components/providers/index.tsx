@@ -39,20 +39,20 @@ export function AppProvider({ children }: Prop) {
   const [queryClient] = useState(() => new QueryClient(TANSTACK_CONFIG));
 
   return (
-    <ProcessEventHandlers>
-      <TooltipProvider delayDuration={300}>
-        <ThemeProvider attribute="class">
-          <QueryClientProvider client={queryClient}>
-            <Provider>
+    <TooltipProvider delayDuration={300}>
+      <ThemeProvider attribute="class">
+        <QueryClientProvider client={queryClient}>
+          <Provider>
+            <ProcessEventHandlers>
               {children}
 
               {/* NOTE: comment this if using devtools inside panel */}
-              {/* <DevTools theme="dark" /> */}
+              <DevTools theme="dark" />
               <ReactQueryDevtools initialIsOpen={false} />
-            </Provider>
-          </QueryClientProvider>
-        </ThemeProvider>
-      </TooltipProvider>
-    </ProcessEventHandlers>
+            </ProcessEventHandlers>
+          </Provider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </TooltipProvider>
   );
 }

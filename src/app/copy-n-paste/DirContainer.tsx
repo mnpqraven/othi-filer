@@ -53,7 +53,7 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
           ref={selectoRef}
           selectableTargets={["[id^=diritem-selector]"]}
           selectFromInside
-          hitRate={50}
+          hitRate={10}
           selectByClick
           ratio={0}
           toggleContinueSelect="ctrl"

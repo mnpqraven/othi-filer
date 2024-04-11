@@ -7,6 +7,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { SidebarThumb } from "@/components/SidebarThumb";
 import { MenuTopbar } from "@/components/MenuTopbar";
 import { ContextMenuContainer } from "@/components/ContextMenuContainer";
+import { AppCommandPanel } from "@/components/AppCommandPanel";
 
 export const metadata: Metadata = {
   title: "Filer",
@@ -33,6 +34,8 @@ export default function RootLayout({
               {children}
             </ContextMenuContainer>
           </div>
+
+          <AppCommandPanel />
 
           <Toaster />
           <Sonner />
