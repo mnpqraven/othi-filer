@@ -6,7 +6,7 @@ use crate::{
     utils::metadata::{get_permissions, is_hidden},
 };
 use std::{fs::metadata, os::windows::fs::MetadataExt, path::Path};
-use tauri::api::dir::read_dir;
+use tauri::api::dir::{is_dir, read_dir};
 
 pub fn list_dir(
     path: impl AsRef<Path>,
@@ -26,7 +26,7 @@ pub fn list_dir(
                 false => !is_hidden(&disk_entry.path).unwrap(),
             };
             // filters out jank ass windows folders like Recent or Start Menu
-            let jank_windows = if cfg!(windows) {
+            let jank_windows = if cfg!(windows) && is_dir(disk_entry.path.clone()).unwrap() {
                 return read_dir(disk_entry.path.clone(), false).is_ok();
             } else {
                 false

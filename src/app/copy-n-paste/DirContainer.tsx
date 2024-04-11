@@ -1,7 +1,8 @@
-import { forwardRef, type ComponentPropsWithoutRef } from "react";
+import { forwardRef, useRef, type ComponentPropsWithoutRef } from "react";
 import { ArrowUpToLine } from "lucide-react";
 import { Transition } from "@headlessui/react";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useStore } from "jotai";
+import Selecto from "react-selecto";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,7 +13,7 @@ import {
   usePanelConfig,
 } from "@/hooks/dirAction/useUIAction";
 import { DirPanelItem } from "./DirPanelItem";
-import { panelSideAtom } from "./_store";
+import { panelSideAtom, selectedIdMouseAtom } from "./_store";
 
 interface Prop extends ComponentPropsWithoutRef<typeof ScrollArea> {
   cursorPath: string;
@@ -32,31 +33,71 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
     });
 
     const { mutate } = useBack();
+    const { set } = useStore();
+    const selectoRef = useRef<Selecto>(null);
 
     if (!data) return "listdir loading...";
     return (
       <ScrollArea
-        className={cn(
-          "relative flex flex-col rounded-md border py-2 pl-3 pr-2.5",
-          className,
-        )}
+        className={cn("relative rounded-md border py-2 pl-3 pr-2.5", className)}
         viewportRef={refWithScroll}
+        onScroll={() => {
+          if (selectoRef.current) {
+            selectoRef.current.checkScroll();
+          }
+        }}
         {...props}
         ref={ref}
       >
-        <Button
-          variant="ghost"
-          className="ml-6 w-full justify-start"
-          onClick={() => {
-            mutate(side);
+        <Selecto
+          ref={selectoRef}
+          selectableTargets={["[id^=diritem-selector]"]}
+          selectFromInside
+          hitRate={50}
+          toggleContinueSelect="ctrl"
+          scrollOptions={{
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            container: refWithScroll.current!,
+            throttleTime: 30,
+            threshold: 0,
           }}
-        >
-          ..
-        </Button>
+          onSelect={(e) => {
+            set(
+              selectedIdMouseAtom,
+              e.selected.map((el) => el.id),
+            );
+          }}
+          onDragStart={(e) => {
+            if (e.inputEvent.target.nodeName === "BUTTON") return false;
+            return true;
+          }}
+          onScroll={(e) => {
+            if (
+              e.direction.at(0) !== undefined &&
+              e.direction.at(1) !== undefined
+            )
+              refWithScroll.current?.scrollBy(
+                e.direction[0] * 10,
+                e.direction[1] * 10,
+              );
+          }}
+        />
 
-        {data.map((dir) => (
-          <DirPanelItem dirItem={dir} key={dir.path} />
-        ))}
+        <div className="flex flex-col gap-2">
+          <Button
+            variant="ghost"
+            className="ml-6 w-full justify-start"
+            onClick={() => {
+              mutate(side);
+            }}
+          >
+            ..
+          </Button>
+
+          {data.map((dir) => (
+            <DirPanelItem dirItem={dir} key={dir.path} />
+          ))}
+        </div>
 
         {/* NOTE: better to mask this ? */}
         {scrollToTop ? (
