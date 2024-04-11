@@ -30,11 +30,11 @@ impl CopyUiState {
 #[derive(Debug)]
 #[taurpc::ipc_type]
 pub struct DirActionPanel {
-    // the full path of the current panel
+    /// the full path of the current panel
     pub root_path: String,
-    // this pointer will be use to keep track of current dir for both front-end
-    // and back-end
-    // TODO: travesal function that returns the DirItem
+    /// this pointer will be use to keep track of current dir for both front-end
+    /// and back-end
+    /// TODO: travesal function that returns the DirItem
     pub current_pointer_path: String,
     pub show_hidden: bool,
     pub items: Vec<DirItem>,

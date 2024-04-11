@@ -99,8 +99,8 @@ dependencies:
     specifier: ^1.0.7
     version: 1.0.7(tailwindcss@3.4.3)
   taurpc:
-    specifier: ^1.4.2
-    version: 1.4.2
+    specifier: ^1.4.4
+    version: 1.4.4
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -5385,8 +5385,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /taurpc@1.4.2:
-    resolution: {integrity: sha512-iVnQ+sJIOm0CEgRiEGAjB6XZDSFGKGkKNhxIYSnPW2Ci5XTCc1pR5Wu3gy4Rlz1p9L9v+51Kh3s1GJQzusmoNQ==}
+  /taurpc@1.4.4:
+    resolution: {integrity: sha512-voilZTsgBojbBNP4qVf6ijSjD8aBPF2Jeazr/BCEPI3MDV7rsveTLM85PpVkU7nHTNFbdOtRYBLiJAIDt+I9VQ==}
     dependencies:
       '@tauri-apps/api': 1.5.3
     dev: false
