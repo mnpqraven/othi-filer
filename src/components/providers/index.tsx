@@ -10,11 +10,23 @@ import {
   type QueryClientConfig,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { type AppErrorIpc } from "@/bindings/taurpc";
+import { TooltipProvider } from "../ui/tooltip";
 import { ProcessEventHandlers } from "./eventHandlers";
 
 const TANSTACK_CONFIG: QueryClientConfig = {
   defaultOptions: {
-    queries: { refetchOnWindowFocus: false },
+    queries: { retry: false, refetchOnWindowFocus: false },
+    mutations: {
+      onError(error) {
+        // safe hardcast as soon as rust' error struct remains unchanged
+        const { kind, message } = error as unknown as AppErrorIpc;
+        toast.error(kind, {
+          description: message,
+        });
+      },
+    },
   },
 };
 
@@ -27,17 +39,20 @@ export function AppProvider({ children }: Prop) {
   const [queryClient] = useState(() => new QueryClient(TANSTACK_CONFIG));
 
   return (
-    <ProcessEventHandlers>
+    <TooltipProvider delayDuration={300}>
       <ThemeProvider attribute="class">
         <QueryClientProvider client={queryClient}>
           <Provider>
-            {children}
+            <ProcessEventHandlers>
+              {children}
 
-            <DevTools theme="dark" />
-            <ReactQueryDevtools initialIsOpen={false} />
+              {/* NOTE: comment this if using devtools inside panel */}
+              <DevTools theme="dark" />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </ProcessEventHandlers>
           </Provider>
         </QueryClientProvider>
       </ThemeProvider>
-    </ProcessEventHandlers>
+    </TooltipProvider>
   );
 }

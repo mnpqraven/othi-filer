@@ -8,13 +8,13 @@ import { cn } from "@/lib/utils";
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {viewportRef?: React.Ref<HTMLDivElement>}
->(({ className, children, viewportRef, ...props }, ref) => (
+>(({ className, children, viewportRef, onScroll, ...props }, ref) => (
   <ScrollAreaPrimitive.Root
     ref={ref}
     className={cn("relative overflow-hidden", className)}
     {...props}
   >
-    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]" ref={viewportRef}>
+    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]" ref={viewportRef} onScroll={onScroll}>
       {children}
     </ScrollAreaPrimitive.Viewport>
     <ScrollBar />

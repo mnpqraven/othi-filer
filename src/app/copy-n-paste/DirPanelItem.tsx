@@ -1,6 +1,7 @@
 import { Folder, File, ArrowDownRight, ArrowDown } from "lucide-react";
 import { type HTMLAttributes } from "react";
 import { useAtomValue } from "jotai";
+import { cva } from "class-variance-authority";
 import { type DirItem } from "@/bindings/taurpc";
 import { FileName } from "@/components/FileName";
 import { Button } from "@/components/ui/button";
@@ -11,9 +12,9 @@ import {
   usePanelConfig,
   useSelect,
   useToggleExpand,
-} from "@/hooks/dirAction/useDirAction";
+} from "@/hooks/dirAction/useUIAction";
 import { cn } from "@/lib/utils";
-import { panelSideAtom } from "./_store";
+import { panelSideAtom, selectedIdMouseAtom } from "./_store";
 
 interface Prop extends HTMLAttributes<HTMLDivElement> {
   dirItem: DirItem;
@@ -30,16 +31,13 @@ export function DirPanelItem({ dirItem, className, ...props }: Prop) {
     panelState?.expanded_paths.find((e) => e === dirItem.path),
   );
   const { data: listDirData } = useListDir(
-    { path: dirItem.path, show_hidden: panelState?.show_hidden },
+    { path: dirItem.path, show_hidden: panelState?.show_hidden, side },
     { enabled: panelState?.show_hidden !== undefined && dirIsExpanded },
   );
 
   return (
     <>
-      <div
-        className={cn("flex cursor-pointer items-center gap-2", className)}
-        {...props}
-      >
+      <div className={cn("flex items-center gap-2", className)} {...props}>
         <SelectButton {...dirItem} />
 
         <ExpandButton {...dirItem} />
@@ -47,9 +45,9 @@ export function DirPanelItem({ dirItem, className, ...props }: Prop) {
         <FileMetaBlock {...dirItem} />
       </div>
 
-      {dirIsExpanded ? (
+      {dirIsExpanded && listDirData?.length ? (
         <div className="flex flex-col gap-2 pl-6">
-          {listDirData?.map((dir) => (
+          {listDirData.map((dir) => (
             <DirPanelItem dirItem={dir} key={dir.path} />
           ))}
         </div>
@@ -83,7 +81,7 @@ function ExpandButton({ is_folder, path }: DirItem) {
   return (
     <Button
       variant="ghost"
-      className="p-0"
+      className="p-0 h-auto"
       onClick={() => {
         toggleExpand({
           folder_path: path,
@@ -101,11 +99,27 @@ function FileMetaBlock(item: DirItem) {
   const { is_folder, path, short_path } = item;
   const { mutate } = useForward();
   const side = useAtomValue(panelSideAtom);
+  const selectedIds = useAtomValue(selectedIdMouseAtom);
+  const isSelected = selectedIds.includes(`diritem-selector-${item.path}`);
+
+  const variants = cva(
+    "min-w-48 justify-start gap-2 px-2 py-0.5 hover:underline h-auto border border-transparent",
+    {
+      variants: {
+        variant: {
+          default: "",
+          selected: "bg-accent/30 text-accent-foreground border-accent",
+        },
+      },
+    },
+  );
+
   return (
     <Button
+      id={`diritem-selector-${item.path}`}
       variant="ghost"
-      className="min-w-0 flex-1 justify-start gap-2 px-2 py-0 hover:underline"
-      onClick={() => {
+      className={variants({ variant: isSelected ? "selected" : "default" })}
+      onDoubleClick={() => {
         if (is_folder) mutate({ side, to: path });
       }}
     >

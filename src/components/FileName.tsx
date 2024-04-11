@@ -17,7 +17,7 @@ export const FileName = forwardRef<HTMLDivElement, Prop>(function FileName(
 
   return (
     <div className={cn("flex min-w-0", className)} ref={ref} {...props}>
-      <span className="text-ellipsis whitespace-nowrap overflow-hidden">
+      <span className="text-ellipsis whitespace-nowrap overflow-hidden select-none">
         {nameNoext}
       </span>
       <span className="shrink-0">{ext}</span>

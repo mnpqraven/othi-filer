@@ -1,20 +1,40 @@
-use super::reducer::Side;
+use super::{list_dir::list_dir, reducer::Side};
+use crate::procedures::data::home::home_dir;
 
 #[derive(Debug)]
 #[taurpc::ipc_type]
-pub struct DirActionState {
+pub struct CopyUiState {
     pub left: DirActionPanel,
     pub right: DirActionPanel,
+}
+
+impl CopyUiState {
+    pub async fn new() -> Result<Self, String> {
+        let home_path = home_dir().unwrap();
+        let default_panel: DirActionPanel = DirActionPanel {
+            root_path: home_path.clone(),
+            current_pointer_path: home_path.clone(),
+            show_hidden: false,
+            items: list_dir(&home_path, false, Some(&home_path)).unwrap(),
+            selected_items: vec![],
+            expanded_paths: vec![],
+        };
+
+        Ok(Self {
+            left: default_panel.clone(),
+            right: default_panel.clone(),
+        })
+    }
 }
 
 #[derive(Debug)]
 #[taurpc::ipc_type]
 pub struct DirActionPanel {
-    // the full path of the current panel
+    /// the full path of the current panel
     pub root_path: String,
-    // this pointer will be use to keep track of current dir for both front-end
-    // and back-end
-    // TODO: travesal function that returns the DirItem
+    /// this pointer will be use to keep track of current dir for both front-end
+    /// and back-end
+    /// TODO: travesal function that returns the DirItem
     pub current_pointer_path: String,
     pub show_hidden: bool,
     pub items: Vec<DirItem>,
@@ -47,6 +67,7 @@ pub struct UpdatePathRequest {
 pub struct ListDirRequest {
     pub path: String,
     pub show_hidden: bool,
+    pub side: Side,
 }
 
 #[taurpc::ipc_type]
@@ -75,9 +96,15 @@ pub struct DirItem {
     // the truncated path of the current panel
     pub short_path: String,
     pub is_folder: bool,
-    pub is_selected: bool,
-    // if this is expanded on the frontend
-    // is_expanded: bool,
+    pub permissions: Option<DirPermission>,
+}
+
+#[derive(Default, Debug)]
+#[taurpc::ipc_type]
+pub struct DirPermission {
+    pub readable: bool,
+    pub writable: bool,
+    pub executable: bool,
 }
 
 impl DirItem {

@@ -1,3 +1,5 @@
+'use client'
+
 /* eslint-disable react/no-array-index-key */
 import { Fragment } from "react";
 import {
@@ -65,6 +67,10 @@ export function MenuTopbar() {
     },
   ];
 
+  // TODO:
+  // make values controlled
+  // - values in MenubarMenu
+  // - shared value via jotai, pass atom to menubar
   return (
     <Menubar>
       {menuConfig.map((menu, index) => (

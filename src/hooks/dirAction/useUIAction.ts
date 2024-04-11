@@ -10,7 +10,6 @@ import {
 } from "@tanstack/react-query";
 import {
   type ToggleExpandRequest,
-  type DirActionState,
   type ToggleHiddenRequest,
   type DirItem,
   type ListDirRequest,
@@ -18,14 +17,15 @@ import {
   type DirActionPanel,
   type UpdatePathRequest,
   type SelectRequest,
+  type CopyUiState,
 } from "@/bindings/taurpc";
 import { createRpc } from "@/bindings";
 
-function useUpdateState() {
+export function useUpdateState() {
   const client = useQueryClient();
   const refetch = () =>
     client.refetchQueries({ queryKey: ["data", "app_state"] });
-  const update = (to: DirActionState) =>
+  const update = (to: CopyUiState) =>
     client.setQueriesData({ queryKey: ["data", "app_state"] }, to);
   return { refetch, update };
 }
@@ -33,7 +33,7 @@ function useUpdateState() {
 export function usePanelConfig(
   { side }: { side: Side },
   queryOpt?: Partial<
-    UseQueryOptions<DirActionState, Error, DirActionPanel, unknown[]>
+    UseQueryOptions<CopyUiState, Error, DirActionPanel, unknown[]>
   >,
 ) {
   return useQuery({
@@ -48,22 +48,25 @@ export function usePanelConfig(
 }
 
 export function useListDir(
-  { path, show_hidden }: Partial<ListDirRequest>,
+  { path, show_hidden, side }: Partial<ListDirRequest>,
   opt?: Partial<UseQueryOptions<DirItem[], Error, DirItem[]>>,
 ) {
   return useQuery({
-    enabled: Boolean(path?.length) && show_hidden !== undefined,
+    enabled:
+      Boolean(path?.length) && show_hidden !== undefined && Boolean(side),
     ...opt,
     queryKey: ["actions", "list_dir", { path, show_hidden }],
-    queryFn: path
-      ? async () => {
-          const r = await createRpc();
-          return await r.actions.list_dir({
-            path,
-            show_hidden: show_hidden ?? false,
-          });
-        }
-      : skipToken,
+    queryFn:
+      path && side
+        ? async () => {
+            const r = await createRpc();
+            return await r.actions.ui.list_dir({
+              path,
+              show_hidden: show_hidden ?? false,
+              side,
+            });
+          }
+        : skipToken,
     placeholderData: keepPreviousData,
   });
 }
@@ -74,7 +77,7 @@ export function useToggleExpand() {
     mutationKey: ["actions", "toggle_expand"],
     mutationFn: async (param: ToggleExpandRequest) => {
       const r = await createRpc();
-      return await r.actions.toggle_expand(param);
+      return await r.actions.ui.toggle_expand(param);
     },
     onSuccess: update,
   });
@@ -86,7 +89,7 @@ export function useSetHidden() {
     mutationKey: ["actions", "set_hidden"],
     mutationFn: async (params: ToggleHiddenRequest) => {
       const r = await createRpc();
-      return await r.actions.toggle_hidden(params);
+      return await r.actions.ui.toggle_hidden(params);
     },
     onSuccess: update,
   });
@@ -98,7 +101,7 @@ export function useUpdateCursorPath() {
     mutationKey: ["actions", "update_cursor"],
     mutationFn: async (params: UpdatePathRequest) => {
       const r = await createRpc();
-      return await r.actions.update_cursor_path(params);
+      return await r.actions.ui.update_cursor_path(params);
     },
     onSuccess: update,
   });
@@ -110,7 +113,7 @@ export function useForward() {
     mutationKey: ["actions", "forward"],
     mutationFn: async (params: UpdatePathRequest) => {
       const r = await createRpc();
-      return await r.actions.forward(params);
+      return await r.actions.ui.forward(params);
     },
     onSuccess: update,
   });
@@ -122,7 +125,7 @@ export function useBack() {
     mutationKey: ["actions", "back"],
     mutationFn: async (params: Side) => {
       const r = await createRpc();
-      return await r.actions.back(params);
+      return await r.actions.ui.back(params);
     },
     onSuccess: update,
   });
@@ -134,7 +137,19 @@ export function useSelect() {
     mutationKey: ["actions", "select"],
     mutationFn: async (params: SelectRequest) => {
       const r = await createRpc();
-      return await r.actions.select(params);
+      return await r.actions.ui.select(params);
+    },
+    onSuccess: update,
+  });
+}
+
+export function useSwapSides() {
+  const { update } = useUpdateState();
+  return useMutation({
+    mutationKey: ["actions", "swap_sides"],
+    mutationFn: async () => {
+      const r = await createRpc();
+      return await r.actions.ui.swap_sides();
     },
     onSuccess: update,
   });

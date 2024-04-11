@@ -1,8 +1,11 @@
 "use client";
 
 import { Provider } from "jotai";
-import { SidebarThumb } from "@/components/SidebarThumb";
-import { MenuTopbar } from "@/components/MenuTopbar";
+import { DevTools } from "jotai-devtools";
+import {
+  ContextMenuContainer,
+  MENU_CONTEXT,
+} from "@/components/ContextMenuContainer";
 import { Panel } from "./Panel";
 import { MiddleActionRow } from "./MiddleActionRow";
 import { leftPanelStore, rightPanelStore } from "./_store";
@@ -15,23 +18,29 @@ import { leftPanelStore, rightPanelStore } from "./_store";
  */
 export default function Page() {
   return (
-    <div className="flex flex-col h-screen px-4 py-2 gap-2">
-      <div className="flex gap-2">
-        <SidebarThumb />
-        <MenuTopbar />
-      </div>
-
-      <div className="flex justify-center gap-4 min-h-0 h-full">
-        <Provider store={leftPanelStore}>
+    <div className="flex justify-center gap-4 min-h-0 h-full">
+      <Provider store={leftPanelStore}>
+        <ContextMenuContainer
+          asChild
+          context={{ ctx: MENU_CONTEXT.panel, attr: { side: "left" } }}
+        >
           <Panel className="w-5/12" />
-        </Provider>
+        </ContextMenuContainer>
 
-        <MiddleActionRow className="grow-0 self-center" />
+        {/* NOTE: move this to debuggin panel */}
+        <DevTools theme="dark" position="bottom-left" />
+      </Provider>
 
-        <Provider store={rightPanelStore}>
+      <MiddleActionRow className="grow-0 self-center" />
+
+      <Provider store={rightPanelStore}>
+        <ContextMenuContainer
+          asChild
+          context={{ ctx: MENU_CONTEXT.panel, attr: { side: "right" } }}
+        >
           <Panel className="w-5/12" />
-        </Provider>
-      </div>
+        </ContextMenuContainer>
+      </Provider>
     </div>
   );
 }

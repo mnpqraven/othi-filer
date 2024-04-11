@@ -1,17 +1,17 @@
-use super::actions::{types::DirActionState, AppStateArc};
+use super::actions::types::CopyUiState;
+use crate::common::AppStateArc;
 
 pub mod home;
 
 #[taurpc::procedures(path = "data", export_to = "../src/bindings/taurpc.ts")]
 pub trait Data {
-    async fn get_state() -> Result<DirActionState, String>;
+    async fn get_state() -> Result<CopyUiState, String>;
 }
 
 #[taurpc::resolvers]
 impl Data for AppStateArc {
-    async fn get_state(self) -> Result<DirActionState, String> {
+    async fn get_state(self) -> Result<CopyUiState, String> {
         let state = self.state.lock().await;
-        dbg!(state.clone().left.current_pointer_path);
         Ok(state.clone())
     }
 }
