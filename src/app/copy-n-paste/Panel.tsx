@@ -172,7 +172,7 @@ const CopyButton = forwardRef<
             includes_hidden: leftData.show_hidden,
             strategy: "DepthFirst",
             to: rightData.current_pointer_path,
-            include_wrapping_dir: true,
+            includes_wrapping_dir: true,
           });
           break;
         }
@@ -182,7 +182,7 @@ const CopyButton = forwardRef<
             includes_hidden: rightData.show_hidden,
             strategy: "DepthFirst",
             to: leftData.current_pointer_path,
-            include_wrapping_dir: true,
+            includes_wrapping_dir: true,
           });
           break;
         }
@@ -223,7 +223,7 @@ const MoveButton = forwardRef<
         includes_hidden: leftData.show_hidden,
         strategy: null,
         to: rightData.current_pointer_path,
-        include_wrapping_dir: true,
+        includes_wrapping_dir: true,
       });
     }
   }

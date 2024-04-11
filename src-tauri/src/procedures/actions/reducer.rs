@@ -53,7 +53,7 @@ pub async fn dispatch_action(
             // current dir
             ancestors.next();
             if let Some(next_path) = ancestors.next() {
-                panel.current_pointer_path = next_path.to_str().unwrap().to_owned()
+                next_path.to_str().unwrap().clone_into(&mut panel.current_pointer_path)
             }
         }
         DirActionSchema::ToggleExpand(ToggleExpandRequest {

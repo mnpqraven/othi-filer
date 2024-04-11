@@ -18,7 +18,7 @@ pub struct CopyRequest {
     to: String,
     includes_hidden: bool,
     strategy: Option<CopyStrategy>,
-    include_wrapping_dir: bool,
+    includes_wrapping_dir: bool,
 }
 
 #[derive(Serialize, Deserialize, specta::Type, Clone)]
@@ -44,33 +44,10 @@ impl FileAction for AppStateArc {
             );
         }
 
-        copy_wrapper(
-            // self,
-            params.from,
-            params.to,
-            params.strategy.unwrap_or(CopyStrategy::DepthFirst),
-            params.include_wrapping_dir,
-            false,
-        )
-        .await
+        copy_wrapper(params, false).await
     }
 
     async fn moves(self, params: CopyRequest) -> Result<(), AppErrorIpc> {
-        // ensures dirs don't overlap
-        let CopyRequest {
-            from,
-            to,
-            includes_hidden,
-            strategy,
-            include_wrapping_dir,
-        } = params;
-        copy_wrapper(
-            from,
-            to,
-            strategy.unwrap_or(CopyStrategy::DepthFirst),
-            include_wrapping_dir,
-            true,
-        )
-        .await
+        copy_wrapper(params, true).await
     }
 }
