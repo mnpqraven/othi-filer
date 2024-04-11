@@ -54,6 +54,8 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
           selectableTargets={["[id^=diritem-selector]"]}
           selectFromInside
           hitRate={50}
+          selectByClick
+          ratio={0}
           toggleContinueSelect="ctrl"
           scrollOptions={{
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -72,14 +74,10 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
             return true;
           }}
           onScroll={(e) => {
-            if (
-              e.direction.at(0) !== undefined &&
-              e.direction.at(1) !== undefined
-            )
-              refWithScroll.current?.scrollBy(
-                e.direction[0] * 10,
-                e.direction[1] * 10,
-              );
+            const yDelta = e.direction.at(1);
+            if (yDelta !== undefined)
+              // only scrolls vertically
+              refWithScroll.current?.scrollBy(0, yDelta * 10);
           }}
         />
 

@@ -12,8 +12,8 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { type AppErrorIpc } from "@/bindings/taurpc";
-import { ProcessEventHandlers } from "./eventHandlers";
 import { TooltipProvider } from "../ui/tooltip";
+import { ProcessEventHandlers } from "./eventHandlers";
 
 const TANSTACK_CONFIG: QueryClientConfig = {
   defaultOptions: {
@@ -46,7 +46,8 @@ export function AppProvider({ children }: Prop) {
             <Provider>
               {children}
 
-              <DevTools theme="dark" />
+              {/* NOTE: comment this if using devtools inside panel */}
+              {/* <DevTools theme="dark" /> */}
               <ReactQueryDevtools initialIsOpen={false} />
             </Provider>
           </QueryClientProvider>

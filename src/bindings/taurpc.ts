@@ -48,7 +48,7 @@ export type AppErrorIpc = { kind: string; message: string }
 
 export type ToggleHiddenRequest = { side: Side; to: boolean }
 
-const ARGS_MAP = {"actions.ui":"{\"toggle_hidden\":[\"params\"],\"toggle_expand\":[\"params\"],\"back\":[\"params\"],\"select\":[\"params\"],\"list_dir\":[\"params\"],\"forward\":[\"params\"],\"swap_sides\":[],\"update_cursor_path\":[\"params\"]}","":"{\"hello_world\":[]}","actions.file":"{\"moves\":[\"params\"],\"copy\":[\"params\"]}","data":"{\"get_state\":[]}","actions":"{}"}
+const ARGS_MAP = {"actions.file":"{\"moves\":[\"params\"],\"copy\":[\"params\"]}","data":"{\"get_state\":[]}","":"{\"hello_world\":[]}","actions":"{}","actions.ui":"{\"toggle_hidden\":[\"params\"],\"toggle_expand\":[\"params\"],\"back\":[\"params\"],\"select\":[\"params\"],\"list_dir\":[\"params\"],\"forward\":[\"params\"],\"swap_sides\":[],\"update_cursor_path\":[\"params\"]}"}
 import { createTauRPCProxy as createProxy } from "taurpc"
 
 export const createTauRPCProxy = () => createProxy<Router>(ARGS_MAP)
