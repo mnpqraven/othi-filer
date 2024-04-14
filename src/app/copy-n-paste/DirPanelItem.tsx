@@ -62,6 +62,7 @@ function SelectButton({ path }: DirItem) {
 
   return (
     <Checkbox
+      tabIndex={-1}
       onCheckedChange={(e) => {
         const selected = e === "indeterminate" ? false : e;
         mutate({ side, path, selected });
@@ -80,6 +81,7 @@ function ExpandButton({ is_folder, path }: DirItem) {
   if (!is_folder) return null;
   return (
     <Button
+      tabIndex={-1}
       variant="ghost"
       className="p-0 h-auto"
       onClick={() => {
@@ -100,7 +102,7 @@ function FileMetaBlock(item: DirItem) {
   const { mutate } = useForward();
   const side = useAtomValue(panelSideAtom);
   const selectedIds = useAtomValue(selectedIdMouseAtom);
-  const isSelected = selectedIds.includes(`diritem-selector-${item.path}`);
+  const isSelected = selectedIds.includes(`diritem-selector-${side}-${item.path}`);
 
   const variants = cva(
     "min-w-48 justify-start gap-2 px-2 py-0.5 hover:underline h-auto border border-transparent",
@@ -116,7 +118,7 @@ function FileMetaBlock(item: DirItem) {
 
   return (
     <Button
-      id={`diritem-selector-${item.path}`}
+      id={`diritem-selector-${side}-${item.path}`}
       variant="ghost"
       className={variants({ variant: isSelected ? "selected" : "default" })}
       onDoubleClick={() => {

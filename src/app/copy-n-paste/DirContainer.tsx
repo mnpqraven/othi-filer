@@ -109,6 +109,7 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
             leaveTo="opacity-0"
           >
             <Button
+              tabIndex={-1}
               className="absolute bottom-4 right-4 rounded-full p-2.5"
               variant="outline"
               onClick={() => {

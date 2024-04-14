@@ -48,7 +48,7 @@ pub struct DirActionPanel {
 pub struct ToggleExpandRequest {
     pub side: Side,
     pub folder_path: String,
-    pub expanded: bool,
+    pub expanded: Option<bool>,
 }
 
 #[taurpc::ipc_type]

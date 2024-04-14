@@ -44,13 +44,13 @@ export type TauRpcUIActionInputTypes = { proc_name: "list_dir"; input_type: { __
 
 export type TauRpcUIActionOutputTypes = { proc_name: "list_dir"; output_type: DirItem[] } | { proc_name: "toggle_expand"; output_type: CopyUiState } | { proc_name: "toggle_hidden"; output_type: CopyUiState } | { proc_name: "update_cursor_path"; output_type: CopyUiState } | { proc_name: "forward"; output_type: CopyUiState } | { proc_name: "back"; output_type: CopyUiState } | { proc_name: "select"; output_type: CopyUiState } | { proc_name: "swap_sides"; output_type: CopyUiState }
 
-export type ToggleExpandRequest = { side: Side; folder_path: string; expanded: boolean }
+export type ToggleExpandRequest = { side: Side; folder_path: string; expanded: boolean | null }
 
 export type ToggleHiddenRequest = { side: Side; to: boolean }
 
 export type UpdatePathRequest = { side: Side; to: string }
 
-const ARGS_MAP = {"data":"{\"get_state\":[]}","actions.file":"{\"copy\":[\"params\"],\"moves\":[\"params\"]}","actions.ui":"{\"list_dir\":[\"params\"],\"toggle_expand\":[\"params\"],\"forward\":[\"params\"],\"back\":[\"params\"],\"update_cursor_path\":[\"params\"],\"select\":[\"params\"],\"swap_sides\":[],\"toggle_hidden\":[\"params\"]}"}
+const ARGS_MAP = {"actions.file":"{\"copy\":[\"params\"],\"moves\":[\"params\"]}","actions.ui":"{\"forward\":[\"params\"],\"toggle_hidden\":[\"params\"],\"toggle_expand\":[\"params\"],\"back\":[\"params\"],\"update_cursor_path\":[\"params\"],\"list_dir\":[\"params\"],\"swap_sides\":[],\"select\":[\"params\"]}","data":"{\"get_state\":[]}"}
 import { createTauRPCProxy as createProxy } from "taurpc"
 
 export const createTauRPCProxy = () => createProxy<Router>(ARGS_MAP)

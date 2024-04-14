@@ -2,9 +2,13 @@ use super::types::{
     CopyUiState, DirActionPanel, SelectRequest, ToggleExpandRequest, ToggleHiddenRequest,
     UpdatePathRequest,
 };
-use crate::common::{error::AppErrorIpc, AppStateArc};
+use crate::common::{
+    error::{AppError, AppErrorIpc},
+    AppStateArc,
+};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use tauri::api::dir::is_dir;
 
 #[derive(Clone, Serialize, Deserialize, specta::Type, Debug)]
 #[serde(rename_all = "lowercase")]
@@ -53,7 +57,10 @@ pub async fn dispatch_action(
             // current dir
             ancestors.next();
             if let Some(next_path) = ancestors.next() {
-                next_path.to_str().unwrap().clone_into(&mut panel.current_pointer_path)
+                next_path
+                    .to_str()
+                    .unwrap()
+                    .clone_into(&mut panel.current_pointer_path)
             }
         }
         DirActionSchema::ToggleExpand(ToggleExpandRequest {
@@ -62,15 +69,32 @@ pub async fn dispatch_action(
             side,
         }) => {
             let panel = get_panel_mut(&mut state, side);
-            if expanded {
-                panel.expanded_paths.push(folder_path);
-            } else {
-                let rm_index = panel
-                    .expanded_paths
-                    .iter()
-                    .position(|e| *e == folder_path)
-                    .unwrap();
-                panel.expanded_paths.remove(rm_index);
+            // if not a dir then noop
+            if !is_dir(&folder_path).unwrap_or(false) {
+                return Ok(state.clone());
+            }
+
+            match expanded {
+                Some(true) => {
+                    panel.expanded_paths.push(folder_path);
+                }
+                Some(false) => match panel.expanded_paths.iter().position(|e| *e == folder_path) {
+                    Some(rm_index) => {
+                        panel.expanded_paths.remove(rm_index);
+                    }
+                    None => {
+                        return Err(AppError::GenericError("file not found".into()).into());
+                    }
+                },
+                // toggle, find
+                None => match panel.expanded_paths.iter().position(|e| *e == folder_path) {
+                    Some(index) => {
+                        panel.expanded_paths.remove(index);
+                    }
+                    None => {
+                        panel.expanded_paths.push(folder_path);
+                    }
+                },
             }
         }
         DirActionSchema::Select(SelectRequest {

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /* eslint-disable react/no-array-index-key */
 import { Fragment } from "react";
@@ -13,6 +13,8 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "./ui/menubar";
+import { useAtom, useAtomValue } from "jotai";
+import { TopMenuAltPressedAtom, TopMenuAltValueAtom } from "@/app/store";
 
 interface ContextBarItem {
   label: string;
@@ -35,6 +37,9 @@ type ContextSubGroupItem =
     };
 
 export function MenuTopbar() {
+  const altPressed = useAtomValue(TopMenuAltPressedAtom);
+  const [value, setValue] = useAtom(TopMenuAltValueAtom);
+
   const menuConfig: ContextBarItem[] = [
     {
       label: "File",
@@ -72,10 +77,19 @@ export function MenuTopbar() {
   // - values in MenubarMenu
   // - shared value via jotai, pass atom to menubar
   return (
-    <Menubar>
+    <Menubar value={value} onValueChange={setValue}>
       {menuConfig.map((menu, index) => (
-        <MenubarMenu key={`${menu.label}-${index.toString()}`}>
-          <MenubarTrigger>{menu.label}</MenubarTrigger>
+        <MenubarMenu key={`${menu.label}-${index.toString()}`} value={`${menu.label}-${index.toString()}`}>
+          <MenubarTrigger>
+            {altPressed ? (
+              <>
+                <span className="underline">{menu.label[0]}</span>
+                {menu.label.slice(1, menu.label.length)}
+              </>
+            ) : (
+              menu.label
+            )}
+          </MenubarTrigger>
           <MenubarContent>
             {menu.subgroupItems.map((dropdownConf, index) => (
               <Fragment key={index}>
