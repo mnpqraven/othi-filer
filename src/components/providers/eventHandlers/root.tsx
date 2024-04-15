@@ -13,7 +13,7 @@ import { useToggleExpand } from "@/hooks/dirAction/useUIAction";
 /**
  * This wrapper component modifies event handlers inherited from tauri and webviews
  */
-export function ProcessEventHandlers({ children }: { children: ReactNode }) {
+export function RootEventHandlers({ children }: { children: ReactNode }) {
   const setCommandOpen = useSetAtom(commandOpenAtom);
   const setAltOpen = useSetAtom(TopMenuAltPressedAtom);
   const setAltValue = useSetAtom(TopMenuAltValueAtom);
@@ -33,6 +33,7 @@ export function ProcessEventHandlers({ children }: { children: ReactNode }) {
       { key: "k", modifiers: { list: ["Ctrl", "Meta"], op: "OR" } },
       (e) => {
         e.preventDefault();
+        console.log("should see once");
         setCommandOpen((open) => !open);
       },
     );
@@ -54,60 +55,6 @@ export function ProcessEventHandlers({ children }: { children: ReactNode }) {
         if (dirItem) {
           const { path, side } = dirItem;
           expand({ folder_path: path, side, expanded: null });
-        }
-      },
-    );
-
-    const nNext = key(
-      { key: "n", modifiers: { list: ["Ctrl"], op: "OR" } },
-      (_e) => {
-        const currentEle = document.activeElement;
-        const dirItem = dirItemConf(currentEle?.id);
-        if (dirItem) {
-          const { path, side } = dirItem;
-          const elements = document.querySelectorAll(
-            `[id^=diritem-selector-${side}]`,
-          );
-          let foundIndex = -1;
-          elements.forEach((element, index) => {
-            const dirItem = dirItemConf(element.id);
-            if (dirItem) {
-              const { path: pathInner } = dirItem;
-              if (pathInner === path) foundIndex = index;
-              if (foundIndex + 1 === index) {
-                document.getElementById(element.id)?.focus();
-              }
-            }
-          });
-        } else {
-          // TODO: focus first element
-        }
-      },
-    );
-
-    const pPrev = key(
-      { key: "p", modifiers: { list: ["Ctrl"], op: "OR" } },
-      (e) => {
-        e.preventDefault();
-        const currentEle = document.activeElement;
-        const dirItem = dirItemConf(currentEle?.id);
-        if (dirItem) {
-          const { path, side } = dirItem;
-          const elements = document.querySelectorAll(
-            `[id^=diritem-selector-${side}]`,
-          );
-          const elementsRev = Array.from(elements).reverse();
-          let foundIndex = -1;
-          elementsRev.forEach((element, index) => {
-            const dirItem = dirItemConf(element.id);
-            if (dirItem) {
-              const { path: pathInner } = dirItem;
-              if (pathInner === path) foundIndex = index;
-              if (foundIndex + 1 === index) {
-                document.getElementById(element.id)?.focus();
-              }
-            }
-          });
         }
       },
     );
@@ -145,8 +92,6 @@ export function ProcessEventHandlers({ children }: { children: ReactNode }) {
     document.addEventListener("keydown", kCommand);
     document.addEventListener("keydown", fFileMenu);
     document.addEventListener("keydown", oExpandDir);
-    document.addEventListener("keydown", nNext);
-    document.addEventListener("keydown", pPrev);
     document.addEventListener("keydown", ctrlHelper);
     document.addEventListener("keydown", altHelper);
     document.addEventListener("keyup", altHelperUndo);
@@ -155,8 +100,6 @@ export function ProcessEventHandlers({ children }: { children: ReactNode }) {
       document.removeEventListener("keydown", kCommand);
       document.removeEventListener("keydown", fFileMenu);
       document.removeEventListener("keydown", oExpandDir);
-      document.removeEventListener("keydown", nNext);
-      document.removeEventListener("keydown", pPrev);
       document.removeEventListener("keydown", ctrlHelper);
       document.removeEventListener("keydown", altHelper);
       document.removeEventListener("keyup", altHelperUndo);
@@ -172,7 +115,7 @@ interface KeyConf {
   key: string;
   modifiers?: { list: Modifiers[]; op: "AND" | "OR" };
 }
-function key(
+export function key(
   keyConf: KeyConf,
   action: (e: KeyboardEvent) => void,
 ): (e: KeyboardEvent) => void {

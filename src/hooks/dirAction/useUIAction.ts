@@ -30,6 +30,16 @@ export function useUpdateState() {
   return { refetch, update };
 }
 
+export function useUiState() {
+  return useQuery({
+    queryKey: ["data", "app_state"],
+    queryFn: async () => {
+      const r = await createRpc();
+      return await r.data.get_state();
+    },
+  });
+}
+
 export function usePanelConfig(
   { side }: { side: Side },
   queryOpt?: Partial<
@@ -150,6 +160,18 @@ export function useSwapSides() {
     mutationFn: async () => {
       const r = await createRpc();
       return await r.actions.ui.swap_sides();
+    },
+    onSuccess: update,
+  });
+}
+
+export function useSetCopyWrappingDir() {
+  const { update } = useUpdateState();
+  return useMutation({
+    mutationKey: ["actions", "copy_wrapping_dir"],
+    mutationFn: async (to?: boolean) => {
+      const r = await createRpc();
+      return await r.actions.ui.set_copy_wrapping_dir(to ?? null);
     },
     onSuccess: update,
   });

@@ -36,6 +36,7 @@ pub trait FileAction {
 #[taurpc::resolvers]
 impl FileAction for AppStateArc {
     async fn copy(self, params: CopyRequest) -> Result<(), AppErrorIpc> {
+        let state = self.state.lock().await;
         let to_path = Path::new(&params.to);
 
         if !empty_dir(to_path)? {
@@ -44,10 +45,11 @@ impl FileAction for AppStateArc {
             );
         }
 
-        copy_wrapper(params, false).await
+        copy_wrapper(params, state.global_config.copy_wrapping_dir).await
     }
 
     async fn moves(self, params: CopyRequest) -> Result<(), AppErrorIpc> {
-        copy_wrapper(params, true).await
+        let state = self.state.lock().await;
+        copy_wrapper(params, state.global_config.copy_wrapping_dir).await
     }
 }

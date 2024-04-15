@@ -24,4 +24,5 @@ export interface CopyPanelReducerSchema {
   addDirs: Side & { files: string[] };
   removeDirs: Side & { files: string[] };
   swapSide: null;
+  setSelectedDirs: Side & { dirs: string[] };
 }

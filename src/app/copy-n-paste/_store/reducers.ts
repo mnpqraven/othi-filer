@@ -43,6 +43,16 @@ export function copyPanelReducer(
     }
     case "swapSide":
       return { left: prev.right, right: prev.left };
+    case "setSelectedDirs": {
+      switch (payload.side) {
+        case "left":
+          return { ...prev, left: { ...prev.left, selected: payload.dirs } };
+        case "right":
+          return { ...prev, right: { ...prev.right, selected: payload.dirs } };
+        default:
+          return prev;
+      }
+    }
     default:
       throw new Error("unimplemented");
   }

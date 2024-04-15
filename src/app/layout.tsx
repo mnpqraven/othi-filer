@@ -8,6 +8,7 @@ import { SidebarThumb } from "@/components/SidebarThumb";
 import { MenuTopbar } from "@/components/MenuTopbar";
 import { ContextMenuContainer } from "@/components/ContextMenuContainer";
 import { AppCommandPanel } from "@/components/AppCommandPanel";
+import { Sidebar } from "@/components/Sidebar";
 
 export const metadata: Metadata = {
   title: "Filer",
@@ -23,17 +24,19 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={GeistSans.className}>
         <AppProvider>
-          <div className="flex flex-col h-screen px-4 py-2 gap-2">
+          <div className="flex h-screen flex-col gap-2 px-4 py-2">
             <div className="flex gap-2">
               <SidebarThumb />
               <MenuTopbar />
             </div>
 
             {/* why the fuck can't i asChild here */}
-            <ContextMenuContainer className="min-h-0 h-full">
+            <ContextMenuContainer className="h-full min-h-0">
               {children}
             </ContextMenuContainer>
           </div>
+
+          <Sidebar />
 
           <AppCommandPanel />
 

@@ -5,7 +5,7 @@ use crate::{
     common::error::{AppError, AppErrorIpc},
     utils::metadata::{get_permissions, is_hidden},
 };
-use std::{fs::metadata, os::windows::fs::MetadataExt, path::Path};
+use std::{fs::metadata,  path::Path};
 use tauri::api::dir::{is_dir, read_dir};
 
 pub fn list_dir(
@@ -14,7 +14,6 @@ pub fn list_dir(
     prefix_to_strip: Option<&str>,
 ) -> Result<Vec<DirItem>, AppErrorIpc> {
     let Ok(dirs) = read_dir(path.as_ref(), false) else {
-        println!("{:?}", path.as_ref().metadata().unwrap().file_attributes());
         // FIX: this is throwing
         return Err(AppError::GenericError("Cannot read the specified path".into()).into());
     };

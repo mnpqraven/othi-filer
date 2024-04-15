@@ -6,6 +6,7 @@ use crate::procedures::data::home::home_dir;
 pub struct CopyUiState {
     pub left: DirActionPanel,
     pub right: DirActionPanel,
+    pub global_config: GlobalUiConfig,
 }
 
 impl CopyUiState {
@@ -23,6 +24,11 @@ impl CopyUiState {
         Ok(Self {
             left: default_panel.clone(),
             right: default_panel.clone(),
+            global_config: {
+                GlobalUiConfig {
+                    copy_wrapping_dir: false,
+                }
+            },
         })
     }
 }
@@ -40,6 +46,12 @@ pub struct DirActionPanel {
     pub items: Vec<DirItem>,
     pub expanded_paths: Vec<String>,
     pub selected_items: Vec<String>,
+}
+
+#[derive(Debug)]
+#[taurpc::ipc_type]
+pub struct GlobalUiConfig {
+    pub copy_wrapping_dir: bool,
 }
 
 // ----------------- INPUTS

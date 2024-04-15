@@ -2,6 +2,8 @@
 
 /* eslint-disable react/no-array-index-key */
 import { Fragment } from "react";
+import { useAtom, useAtomValue } from "jotai";
+import { TopMenuAltPressedAtom, TopMenuAltValueAtom } from "@/app/store";
 import {
   Menubar,
   MenubarContent,
@@ -13,8 +15,6 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "./ui/menubar";
-import { useAtom, useAtomValue } from "jotai";
-import { TopMenuAltPressedAtom, TopMenuAltValueAtom } from "@/app/store";
 
 interface ContextBarItem {
   label: string;
@@ -79,7 +79,10 @@ export function MenuTopbar() {
   return (
     <Menubar value={value} onValueChange={setValue}>
       {menuConfig.map((menu, index) => (
-        <MenubarMenu key={`${menu.label}-${index.toString()}`} value={`${menu.label}-${index.toString()}`}>
+        <MenubarMenu
+          key={`${menu.label}-${index.toString()}`}
+          value={`${menu.label}-${index.toString()}`}
+        >
           <MenubarTrigger>
             {altPressed ? (
               <>

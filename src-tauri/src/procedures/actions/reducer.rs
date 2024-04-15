@@ -26,6 +26,7 @@ pub enum DirActionSchema {
     ToggleHidden(ToggleHiddenRequest),
     Select(SelectRequest),
     SwapSides,
+    SetCopyWrapping(Option<bool>),
 }
 
 pub async fn dispatch_action(
@@ -126,6 +127,15 @@ pub async fn dispatch_action(
             state.left = right_owned;
             state.right = left_owned;
         }
+        DirActionSchema::SetCopyWrapping(some_to) => match some_to {
+            Some(to) => {
+                state.global_config.copy_wrapping_dir = to;
+            }
+            None => {
+                let prev = state.global_config.copy_wrapping_dir;
+                state.global_config.copy_wrapping_dir = !prev;
+            }
+        },
     }
 
     Ok(state.clone())

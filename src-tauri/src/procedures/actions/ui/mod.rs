@@ -18,6 +18,7 @@ pub trait UIAction {
     async fn back(params: Side) -> Result<CopyUiState, AppErrorIpc>;
     async fn select(params: super::types::SelectRequest) -> Result<CopyUiState, AppErrorIpc>;
     async fn swap_sides() -> Result<CopyUiState, AppErrorIpc>;
+    async fn set_copy_wrapping_dir(to: Option<bool>) -> Result<CopyUiState, AppErrorIpc>;
 }
 
 #[taurpc::resolvers]
@@ -64,5 +65,8 @@ impl UIAction for AppStateArc {
 
     async fn swap_sides(self) -> Result<CopyUiState, AppErrorIpc> {
         dispatch_action(self, DirActionSchema::SwapSides).await
+    }
+    async fn set_copy_wrapping_dir(self, to: Option<bool>) -> Result<CopyUiState, AppErrorIpc> {
+        dispatch_action(self, DirActionSchema::SetCopyWrapping(to)).await
     }
 }
