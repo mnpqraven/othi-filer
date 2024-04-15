@@ -6,9 +6,10 @@ import {
   TopMenuAltPressedAtom,
   TopMenuAltValueAtom,
   commandOpenAtom,
+  keybindHelpOpenAtom,
 } from "@/app/store";
-import { dirItemConf } from "@/lib/utils";
 import { useToggleExpand } from "@/hooks/dirAction/useUIAction";
+import { type KeybindConfig, type Modifiers } from "./types";
 
 /**
  * This wrapper component modifies event handlers inherited from tauri and webviews
@@ -17,6 +18,7 @@ export function RootEventHandlers({ children }: { children: ReactNode }) {
   const setCommandOpen = useSetAtom(commandOpenAtom);
   const setAltOpen = useSetAtom(TopMenuAltPressedAtom);
   const setAltValue = useSetAtom(TopMenuAltValueAtom);
+  const setKeybindHelp = useSetAtom(keybindHelpOpenAtom);
   const { mutate: expand } = useToggleExpand();
 
   // disables context menu in prod
@@ -30,39 +32,25 @@ export function RootEventHandlers({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const kCommand = key(
-      { key: "k", modifiers: { list: ["Ctrl", "Meta"], op: "OR" } },
+      { keycode: "k", modifiers: { list: ["Ctrl", "Meta"], op: "OR" } },
       (e) => {
         e.preventDefault();
-        console.log("should see once");
         setCommandOpen((open) => !open);
+      },
+    );
+    const questionCommand = key(
+      { keycode: "?", modifiers: { list: ["Ctrl", "Meta"], op: "OR" } },
+      (e) => {
+        e.preventDefault();
+        setKeybindHelp((open) => !open);
       },
     );
 
     const fFileMenu = key(
-      { key: "f", modifiers: { list: ["Alt"], op: "OR" } },
+      { keycode: "f", modifiers: { list: ["Alt"], op: "OR" } },
       (e) => {
         e.preventDefault();
         setAltValue("File-0");
-      },
-    );
-
-    // TODO: stript id prefix, get path, use for mutation
-    const oExpandDir = key(
-      { key: "o", modifiers: { list: ["Ctrl"], op: "OR" } },
-      (e) => {
-        const currentEle = document.activeElement;
-        const dirItem = dirItemConf(currentEle?.id);
-        if (dirItem) {
-          const { path, side } = dirItem;
-          expand({ folder_path: path, side, expanded: null });
-        }
-      },
-    );
-
-    const mMarkDir = key(
-      { key: "m", modifiers: { list: ["Ctrl"], op: "OR" } },
-      (e) => {
-        const currentEle = document.activeElement;
       },
     );
 
@@ -89,46 +77,41 @@ export function RootEventHandlers({ children }: { children: ReactNode }) {
       }
     };
 
+    document.addEventListener("keydown", questionCommand);
     document.addEventListener("keydown", kCommand);
     document.addEventListener("keydown", fFileMenu);
-    document.addEventListener("keydown", oExpandDir);
     document.addEventListener("keydown", ctrlHelper);
     document.addEventListener("keydown", altHelper);
     document.addEventListener("keyup", altHelperUndo);
     document.addEventListener("keyup", ctrlHelperUndo);
     return () => {
+      document.removeEventListener("keydown", questionCommand);
       document.removeEventListener("keydown", kCommand);
       document.removeEventListener("keydown", fFileMenu);
-      document.removeEventListener("keydown", oExpandDir);
       document.removeEventListener("keydown", ctrlHelper);
       document.removeEventListener("keydown", altHelper);
       document.removeEventListener("keyup", altHelperUndo);
       document.removeEventListener("keyup", ctrlHelperUndo);
     };
-  }, [setAltOpen, setAltValue, setCommandOpen]);
+  }, [expand, setAltOpen, setAltValue, setCommandOpen, setKeybindHelp]);
 
   return children;
 }
 
-type Modifiers = "Ctrl" | "Meta" | "Alt" | "Shift";
-interface KeyConf {
-  key: string;
-  modifiers?: { list: Modifiers[]; op: "AND" | "OR" };
-}
 export function key(
-  keyConf: KeyConf,
+  keyConf: KeybindConfig,
   action: (e: KeyboardEvent) => void,
 ): (e: KeyboardEvent) => void {
-  const { key, modifiers } = keyConf;
+  const { keycode, modifiers } = keyConf;
 
   return (e) => {
-    if (e.key === key && getModCond(e, modifiers)) {
+    if (e.key === keycode && getModCond(e, modifiers)) {
       action(e);
     }
   };
 }
 
-function getModCond(e: KeyboardEvent, conf: KeyConf["modifiers"]) {
+function getModCond(e: KeyboardEvent, conf: KeybindConfig["modifiers"]) {
   if (!conf) return true;
   const bools = conf.list.map((mod) => getModCallback(mod)(e));
   if (conf.op === "OR") {

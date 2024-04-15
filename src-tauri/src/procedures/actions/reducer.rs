@@ -2,10 +2,7 @@ use super::types::{
     CopyUiState, DirActionPanel, SelectRequest, ToggleExpandRequest, ToggleHiddenRequest,
     UpdatePathRequest,
 };
-use crate::common::{
-    error::{AppError, AppErrorIpc},
-    AppStateArc,
-};
+use crate::common::{error::AppErrorIpc, AppStateArc};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::api::dir::is_dir;
@@ -65,61 +62,36 @@ pub async fn dispatch_action(
             }
         }
         DirActionSchema::ToggleExpand(ToggleExpandRequest {
-            expanded,
-            folder_path,
             side,
+            paths,
+            expanded,
         }) => {
-            let panel = get_panel_mut(&mut state, side);
-            // if not a dir then noop
-            if !is_dir(&folder_path).unwrap_or(false) {
+            if paths.is_empty() {
                 return Ok(state.clone());
             }
+            let panel = get_panel_mut(&mut state, side);
+            let (left_iter, right_iter) = (
+                &mut panel.expanded_paths,
+                &paths
+                    .into_iter()
+                    .filter(|path| is_dir(path).unwrap())
+                    .collect::<Vec<String>>(),
+            );
 
-            match expanded {
-                Some(true) => {
-                    panel.expanded_paths.push(folder_path);
-                }
-                Some(false) => match panel.expanded_paths.iter().position(|e| *e == folder_path) {
-                    Some(rm_index) => {
-                        panel.expanded_paths.remove(rm_index);
-                    }
-                    None => {
-                        return Err(AppError::GenericError("file not found".into()).into());
-                    }
-                },
-                // toggle, find
-                None => match panel.expanded_paths.iter().position(|e| *e == folder_path) {
-                    Some(index) => {
-                        panel.expanded_paths.remove(index);
-                    }
-                    None => {
-                        panel.expanded_paths.push(folder_path);
-                    }
-                },
-            }
+            union_flag_switch(left_iter, right_iter, expanded);
         }
         DirActionSchema::Select(SelectRequest {
             side,
-            path,
+            paths,
             selected,
         }) => {
-            let panel = get_panel_mut(&mut state, side);
-            let find = panel
-                .selected_items
-                .iter()
-                .position(|path_in_list| path_in_list.eq(&path));
-            match (find, selected) {
-                // if not in list and `selected` > add
-                (None, true) => {
-                    panel.selected_items.push(path);
-                }
-                // if in list and `!selected` > remove
-                (Some(index), false) => {
-                    panel.selected_items.remove(index);
-                }
-                // rest noop
-                _ => {}
+            if paths.is_empty() {
+                return Ok(state.clone());
             }
+            let panel = get_panel_mut(&mut state, side);
+            let (left_iter, right_iter) = (&mut panel.selected_items, &paths);
+
+            union_flag_switch(left_iter, right_iter, selected);
         }
         DirActionSchema::SwapSides => {
             let left_owned = state.left.clone();
@@ -141,18 +113,50 @@ pub async fn dispatch_action(
     Ok(state.clone())
 }
 
-// TODO: move to utils.rs ?
-fn get_panel_mut(state: &mut CopyUiState, side: Side) -> &mut DirActionPanel {
+pub fn get_panel_mut(state: &mut CopyUiState, side: Side) -> &mut DirActionPanel {
     match side {
         Side::Left => &mut state.left,
         Side::Right => &mut state.right,
     }
 }
 
-#[allow(dead_code)]
 pub fn get_panel(state: &CopyUiState, side: Side) -> &DirActionPanel {
     match side {
         Side::Left => &state.left,
         Side::Right => &state.right,
+    }
+}
+
+/// this functions takes in 2 iterator and mutates the first to either have all
+/// or none of the contents from the 2nd iterator
+fn union_flag_switch(left_iter: &mut Vec<String>, right_iter: &[String], to_value: Option<bool>) {
+    // [hello]
+    // not used high-level
+    let any = right_iter.iter().any(|path| left_iter.contains(path));
+
+    // use these 3 below
+    // [baz]
+    let none = right_iter.iter().all(|path| !left_iter.contains(path));
+    // [hello, bar]
+    let all = right_iter.iter().all(|path| left_iter.contains(path));
+    // [hello, baz]
+    let partial = any && !all;
+
+    match to_value {
+        Some(true) => {
+            left_iter.extend(right_iter.iter().cloned());
+            left_iter.sort();
+            left_iter.dedup();
+        }
+        Some(false) => left_iter.retain(|path| right_iter.contains(path)),
+        None => {
+            if partial | none {
+                left_iter.extend(right_iter.iter().cloned());
+                left_iter.sort();
+                left_iter.dedup();
+            } else if all {
+                left_iter.retain(|path| !right_iter.contains(path))
+            }
+        }
     }
 }

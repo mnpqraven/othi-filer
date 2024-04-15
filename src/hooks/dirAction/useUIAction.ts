@@ -141,7 +141,7 @@ export function useBack() {
   });
 }
 
-export function useSelect() {
+export function useToggleSelect() {
   const { update } = useUpdateState();
   return useMutation({
     mutationKey: ["actions", "select"],

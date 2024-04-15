@@ -1,7 +1,6 @@
 "use client";
 
 import { Provider } from "jotai";
-import { DevTools } from "jotai-devtools";
 import {
   ContextMenuContainer,
   MENU_CONTEXT,
@@ -28,9 +27,6 @@ export default function Page() {
           >
             <Panel className="w-5/12" />
           </ContextMenuContainer>
-
-          {/* NOTE: move this to debuggin panel */}
-          {/* <DevTools theme="dark" position="bottom-left" /> */}
         </PanelEventHandlers>
       </Provider>
 

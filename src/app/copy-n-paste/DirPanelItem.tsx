@@ -10,7 +10,7 @@ import {
   useForward,
   useListDir,
   usePanelConfig,
-  useSelect,
+  useToggleSelect,
   useToggleExpand,
 } from "@/hooks/dirAction/useUIAction";
 import { cn } from "@/lib/utils";
@@ -57,22 +57,26 @@ export function DirPanelItem({ dirItem, className, ...props }: Prop) {
 }
 
 function SelectButton({ path }: DirItem) {
-  const { mutate } = useSelect();
+  const { mutate: select } = useToggleSelect();
   const side = useAtomValue(panelSideAtom);
+  const { data: panelData } = usePanelConfig({ side });
+
+  const checked = panelData?.selected_items.includes(path) ?? false;
 
   return (
     <Checkbox
       tabIndex={-1}
+      checked={checked}
       onCheckedChange={(e) => {
         const selected = e === "indeterminate" ? false : e;
-        mutate({ side, path, selected });
+        select({ side, paths: [path], selected });
       }}
     />
   );
 }
 
 function ExpandButton({ is_folder, path }: DirItem) {
-  const { mutate: toggleExpand } = useToggleExpand();
+  const { mutate: expand } = useToggleExpand();
   const side = useAtomValue(panelSideAtom);
   const { data: panelState } = usePanelConfig({ side });
 
@@ -85,8 +89,8 @@ function ExpandButton({ is_folder, path }: DirItem) {
       variant="ghost"
       className="p-0 h-auto"
       onClick={() => {
-        toggleExpand({
-          folder_path: path,
+        expand({
+          paths: [path],
           side,
           expanded: !expanded,
         });
@@ -102,7 +106,9 @@ function FileMetaBlock(item: DirItem) {
   const { mutate } = useForward();
   const side = useAtomValue(panelSideAtom);
   const selectedIds = useAtomValue(selectedIdMouseAtom);
-  const isSelected = selectedIds.includes(`diritem-selector-${side}-${item.path}`);
+  const isSelected = selectedIds.includes(
+    `diritem-selector-${side}-${item.path}`,
+  );
 
   const variants = cva(
     "min-w-48 justify-start gap-2 px-2 py-0.5 hover:underline h-auto border border-transparent",

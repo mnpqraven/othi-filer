@@ -9,6 +9,7 @@ import { MenuTopbar } from "@/components/MenuTopbar";
 import { ContextMenuContainer } from "@/components/ContextMenuContainer";
 import { AppCommandPanel } from "@/components/AppCommandPanel";
 import { Sidebar } from "@/components/Sidebar";
+import { KeybindHelpDialog } from "@/components/KeybindHelpDialog";
 
 export const metadata: Metadata = {
   title: "Filer",
@@ -39,6 +40,7 @@ export default function RootLayout({
           <Sidebar />
 
           <AppCommandPanel />
+          <KeybindHelpDialog />
 
           <Toaster />
           <Sonner />

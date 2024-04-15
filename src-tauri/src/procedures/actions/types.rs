@@ -59,7 +59,7 @@ pub struct GlobalUiConfig {
 #[taurpc::ipc_type]
 pub struct ToggleExpandRequest {
     pub side: Side,
-    pub folder_path: String,
+    pub paths: Vec<String>,
     pub expanded: Option<bool>,
 }
 
@@ -85,8 +85,8 @@ pub struct ListDirRequest {
 #[taurpc::ipc_type]
 pub struct SelectRequest {
     pub side: Side,
-    pub path: String,
-    pub selected: bool,
+    pub paths: Vec<String>,
+    pub selected: Option<bool>,
 }
 
 // ----------------- OUTPUTS
