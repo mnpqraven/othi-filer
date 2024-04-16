@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { createRpc } from "@/bindings";
 import { type CopyRequest } from "@/bindings/taurpc";
 import { useUpdateState } from "./useUIAction";
@@ -11,7 +12,10 @@ export function useCopy() {
       const t = await createRpc();
       return await t.actions.file.copy(params);
     },
-    onSuccess: refetch,
+    onSuccess: async () => {
+      await refetch();
+      toast.success("Files copied successfully");
+    },
   });
 }
 
@@ -23,6 +27,9 @@ export function useMove() {
       const t = await createRpc();
       return await t.actions.file.moves(params);
     },
-    onSuccess: refetch,
+    onSuccess: async () => {
+      await refetch();
+      toast.success("Files moved successfully");
+    },
   });
 }

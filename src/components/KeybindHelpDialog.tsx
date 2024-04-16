@@ -1,8 +1,11 @@
+/* eslint-disable react/no-array-index-key */
 "use client";
 
 import { useAtom } from "jotai";
 import { cva } from "class-variance-authority";
+import { type HTMLAttributes, forwardRef } from "react";
 import { keybindHelpOpenAtom } from "@/app/store";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -61,7 +64,6 @@ export function KeybindHelpDialog() {
             </p>
             <div className="grid grid-cols-2 gap-4">
               {generalKeybinds.map((kb, index) => (
-                // eslint-disable-next-line react/no-array-index-key
                 <Keybind key={index} {...kb} />
               ))}
             </div>
@@ -71,7 +73,6 @@ export function KeybindHelpDialog() {
             </p>
             <div className="grid grid-cols-2 gap-4">
               {fileKeybinds.map((kb, index) => (
-                // eslint-disable-next-line react/no-array-index-key
                 <Keybind key={index} {...kb} />
               ))}
             </div>
@@ -82,27 +83,33 @@ export function KeybindHelpDialog() {
   );
 }
 
-function Keybind({ description, keycode, modifiers }: KeybindConfig) {
+const Keybind = forwardRef<
+  HTMLDivElement,
+  KeybindConfig & HTMLAttributes<HTMLDivElement>
+>(function Keybind(
+  { description, keycode, modifiers, className, ...props },
+  ref,
+) {
   const opJoinSymbol = modifiers?.op === "AND" ? "+" : "/";
   const codeVariant = cva(
-    "bg-muted text-muted-foreground pointer-events-none right-2 inline-flex h-5 select-none items-center gap-1 rounded border px-1.5 font-mono font-medium opacity-100 text-sm",
+    "pointer-events-none right-2 inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-sm font-medium text-muted-foreground opacity-100",
   );
   return (
-    <div className="flex justify-between">
+    <div className={cn("flex justify-between", className)} ref={ref} {...props}>
       <span>{description}</span>
 
       <div>
         <kbd className={codeVariant()}>
           {modifiers?.list.map((mod, index) => (
-            // eslint-disable-next-line react/no-array-index-key
             <span key={index}>
               {modLabel(mod)}{" "}
               {index + 1 < modifiers.list.length ? opJoinSymbol : null}{" "}
             </span>
           ))}
-        </kbd>{" "}
-        + <kbd className={codeVariant()}>{keycode}</kbd>
+        </kbd>
+        <span>{" + "}</span>
+        <kbd className={codeVariant()}>{keycode}</kbd>
       </div>
     </div>
   );
-}
+});

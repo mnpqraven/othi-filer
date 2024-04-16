@@ -2,7 +2,7 @@ use super::types::{
     CopyUiState, DirActionPanel, SelectRequest, ToggleExpandRequest, ToggleHiddenRequest,
     UpdatePathRequest,
 };
-use crate::common::{error::AppErrorIpc, AppStateArc};
+use crate::common::{error::AppError, AppStateArc};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::api::dir::is_dir;
@@ -29,7 +29,7 @@ pub enum DirActionSchema {
 pub async fn dispatch_action(
     guard: AppStateArc,
     action: DirActionSchema,
-) -> Result<CopyUiState, AppErrorIpc> {
+) -> Result<CopyUiState, AppError> {
     let mut state = guard.state.lock().await;
 
     match action {
@@ -57,7 +57,7 @@ pub async fn dispatch_action(
             if let Some(next_path) = ancestors.next() {
                 next_path
                     .to_str()
-                    .unwrap()
+                    .ok_or(AppError::FileNameFormat)?
                     .clone_into(&mut panel.current_pointer_path)
             }
         }
@@ -74,7 +74,7 @@ pub async fn dispatch_action(
                 &mut panel.expanded_paths,
                 &paths
                     .into_iter()
-                    .filter(|path| is_dir(path).unwrap())
+                    .filter(|path| is_dir(path).unwrap_or_default())
                     .collect::<Vec<String>>(),
             );
 
@@ -148,7 +148,7 @@ fn union_flag_switch(left_iter: &mut Vec<String>, right_iter: &[String], to_valu
             left_iter.sort();
             left_iter.dedup();
         }
-        Some(false) => left_iter.retain(|path| right_iter.contains(path)),
+        Some(false) => left_iter.retain(|path| !right_iter.contains(path)),
         None => {
             if partial | none {
                 left_iter.extend(right_iter.iter().cloned());

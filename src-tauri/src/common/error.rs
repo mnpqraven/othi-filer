@@ -11,34 +11,47 @@ pub struct AppErrorIpc {
 pub enum AppError {
     #[error(transparent)]
     Io(#[from] std::io::Error),
-    #[error("the mutex was poisoned")]
+    #[error(transparent)]
+    StripPrefix(#[from] std::path::StripPrefixError),
+    #[error(transparent)]
+    Walkdir(#[from] walkdir::Error),
+    #[error("The mutex was poisoned")]
     PoisonError(String),
     #[error("{0}")]
     GenericError(String),
     #[error("{0}")]
     ChangeError(String),
+    #[error("Invalid file name format")]
+    FileNameFormat,
+    #[error("Invalid path: {0}")]
+    InvalidPath(String),
+}
+
+impl AppError {
+    fn get_kind(&self) -> String {
+        let kind = match self {
+            AppError::Io(_) => "I/O Error",
+            AppError::PoisonError(_) => "Mutex Lock Error",
+            AppError::ChangeError(_) => "Change Error",
+            _ => "Error",
+        };
+        kind.to_string()
+    }
 }
 
 impl From<AppError> for AppErrorIpc {
     fn from(value: AppError) -> Self {
-        match value {
-            AppError::Io(e) => Self {
-                kind: "I/O Error".into(),
-                message: e.to_string(),
-            },
-            AppError::PoisonError(e) => Self {
-                kind: "Mutex Lock Error".into(),
-                message: e,
-            },
-            AppError::GenericError(e) => Self {
-                kind: "Error".into(),
-                message: e,
-            },
-            AppError::ChangeError(e) => Self {
-                kind: "Change Error".into(),
-                message: e,
-            },
-        }
+        let kind = value.get_kind();
+        let message = value.to_string();
+        Self { kind, message }
+    }
+}
+
+impl From<&AppError> for AppErrorIpc {
+    fn from(value: &AppError) -> Self {
+        let kind = value.get_kind();
+        let message = value.to_string();
+        Self { kind, message }
     }
 }
 
@@ -48,7 +61,8 @@ impl serde::Serialize for AppError {
     where
         S: serde::ser::Serializer,
     {
-        serializer.serialize_str(self.to_string().as_ref())
+        let ipc: AppErrorIpc = AppErrorIpc::from(self);
+        ipc.serialize(serializer)
     }
 }
 

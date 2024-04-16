@@ -13,6 +13,7 @@ import { open } from "@tauri-apps/api/dialog";
 import { useAtomValue } from "jotai";
 import { Button } from "@/components/ui/button";
 import {
+  useListDir,
   usePanelConfig,
   useSetHidden,
   useUpdateCursorPath,
@@ -52,7 +53,7 @@ export function Panel({ className, ...props }: Prop) {
       />
 
       <div className="flex justify-between">
-        <div className="flex gap-2.5 items-center">
+        <div className="flex items-center gap-2.5">
           <SelectFolderButton>
             <FolderOpen className="h-5 w-5" />
           </SelectFolderButton>
@@ -105,14 +106,25 @@ const RefreshButton = forwardRef<
   HTMLButtonElement,
   Omit<HTMLAttributes<HTMLButtonElement>, "onClick">
 >(function RefreshButton({ className, children, ...props }, ref) {
+  const side = useAtomValue(panelSideAtom);
+  const { data: panelState } = usePanelConfig({ side });
   const { refetch } = useUpdateState();
+  const { refetch: refetchDir } = useListDir({
+    path: panelState?.current_pointer_path,
+    show_hidden: panelState?.show_hidden,
+    side,
+  });
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
           variant="outline"
           className={cn("p-2.5", className)}
-          onClick={refetch}
+          onClick={() => {
+            void refetch();
+            void refetchDir();
+          }}
           {...props}
           ref={ref}
         >

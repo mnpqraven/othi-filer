@@ -1,4 +1,4 @@
-import { Folder, File, ArrowDownRight, ArrowDown } from "lucide-react";
+import { Folder, File, ArrowDownRight, ArrowDown, Loader } from "lucide-react";
 import { type HTMLAttributes } from "react";
 import { useAtomValue } from "jotai";
 import { cva } from "class-variance-authority";
@@ -30,11 +30,18 @@ export function DirPanelItem({ dirItem, className, ...props }: Prop) {
   const dirIsExpanded = Boolean(
     panelState?.expanded_paths.find((e) => e === dirItem.path),
   );
-  const { data: listDirData } = useListDir(
+  const { data: listDirData, isLoading } = useListDir(
     { path: dirItem.path, show_hidden: panelState?.show_hidden, side },
     { enabled: panelState?.show_hidden !== undefined && dirIsExpanded },
   );
 
+  if (isLoading)
+    return (
+      <>
+        <Loader className="animate-spin" />
+        Loading ...
+      </>
+    );
   return (
     <>
       <div className={cn("flex items-center gap-2", className)} {...props}>
@@ -87,7 +94,7 @@ function ExpandButton({ is_folder, path }: DirItem) {
     <Button
       tabIndex={-1}
       variant="ghost"
-      className="p-0 h-auto"
+      className="h-auto p-0"
       onClick={() => {
         expand({
           paths: [path],
@@ -111,12 +118,12 @@ function FileMetaBlock(item: DirItem) {
   );
 
   const variants = cva(
-    "min-w-48 justify-start gap-2 px-2 py-0.5 hover:underline h-auto border border-transparent",
+    "min-w-48 h-auto justify-start gap-2 border border-transparent px-2 py-0.5 hover:underline",
     {
       variants: {
         variant: {
           default: "",
-          selected: "bg-accent/30 text-accent-foreground border-accent",
+          selected: "border-accent bg-accent/30 text-accent-foreground",
         },
       },
     },

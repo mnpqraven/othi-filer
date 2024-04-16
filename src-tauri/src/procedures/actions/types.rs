@@ -1,5 +1,5 @@
 use super::{list_dir::list_dir, reducer::Side};
-use crate::procedures::data::home::home_dir;
+use crate::{common::error::AppError, procedures::data::home::home_dir};
 
 #[derive(Debug)]
 #[taurpc::ipc_type]
@@ -10,13 +10,13 @@ pub struct CopyUiState {
 }
 
 impl CopyUiState {
-    pub async fn new() -> Result<Self, String> {
-        let home_path = home_dir().unwrap();
+    pub async fn new() -> Result<Self, AppError> {
+        let home_path = home_dir()?;
         let default_panel: DirActionPanel = DirActionPanel {
             root_path: home_path.clone(),
             current_pointer_path: home_path.clone(),
             show_hidden: false,
-            items: list_dir(&home_path, false, Some(&home_path)).unwrap(),
+            items: list_dir(&home_path, false, Some(&home_path))?,
             selected_items: vec![],
             expanded_paths: vec![],
         };
@@ -103,9 +103,9 @@ pub struct ListDirOut {
 #[derive(Default, Debug)]
 #[taurpc::ipc_type]
 pub struct DirItem {
-    // the full path of the current panel
+    /// the full path of the current panel
     pub path: String,
-    // the truncated path of the current panel
+    /// the truncated path of the current panel
     pub short_path: String,
     pub is_folder: bool,
     pub permissions: Option<DirPermission>,
