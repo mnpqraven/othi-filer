@@ -9,9 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   useForward,
   useListDir,
-  usePanelConfig,
   useToggleSelect,
   useToggleExpand,
+  useUiState,
 } from "@/hooks/dirAction/useUIAction";
 import { cn } from "@/lib/utils";
 import { panelSideAtom, selectedIdMouseAtom } from "./_store";
@@ -25,7 +25,7 @@ interface Prop extends HTMLAttributes<HTMLDivElement> {
  */
 export function DirPanelItem({ dirItem, className, ...props }: Prop) {
   const side = useAtomValue(panelSideAtom);
-  const { data: panelState } = usePanelConfig({ side });
+  const { data: panelState } = useUiState({ select: (data) => data[side] });
 
   const dirIsExpanded = Boolean(
     panelState?.expanded_paths.find((e) => e === dirItem.path),
@@ -59,7 +59,7 @@ export function DirPanelItem({ dirItem, className, ...props }: Prop) {
 function SelectButton({ path }: DirItem) {
   const { mutate: select } = useToggleSelect();
   const side = useAtomValue(panelSideAtom);
-  const { data: panelData } = usePanelConfig({ side });
+  const { data: panelData } = useUiState({ select: (data) => data[side] });
 
   const checked = panelData?.selected_items.includes(path) ?? false;
 
@@ -78,7 +78,7 @@ function SelectButton({ path }: DirItem) {
 function ExpandButton({ is_folder, path }: DirItem) {
   const { mutate: expand } = useToggleExpand();
   const side = useAtomValue(panelSideAtom);
-  const { data: panelState } = usePanelConfig({ side });
+  const { data: panelState } = useUiState({ select: (data) => data[side] });
 
   const expanded = Boolean(panelState?.expanded_paths.find((e) => e === path));
 

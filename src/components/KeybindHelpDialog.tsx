@@ -6,13 +6,7 @@ import { cva } from "class-variance-authority";
 import { type HTMLAttributes, forwardRef } from "react";
 import { keybindHelpOpenAtom } from "@/app/store";
 import { cn } from "@/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "./ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { type KeybindConfig, modLabel } from "./providers/eventHandlers/types";
 
 export function KeybindHelpDialog() {
@@ -58,26 +52,25 @@ export function KeybindHelpDialog() {
       <DialogContent className="max-w-6xl">
         <DialogHeader>
           <DialogTitle>Keybinds</DialogTitle>
-          <DialogDescription className="space-y-4 pt-4">
-            <p className="text-lg font-semibold leading-none text-primary">
-              General
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              {generalKeybinds.map((kb, index) => (
-                <Keybind key={index} {...kb} />
-              ))}
-            </div>
-
-            <p className="text-lg font-semibold leading-none text-primary">
-              Copy n&apos; Paste
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              {fileKeybinds.map((kb, index) => (
-                <Keybind key={index} {...kb} />
-              ))}
-            </div>
-          </DialogDescription>
         </DialogHeader>
+
+        <p className="text-lg font-semibold leading-none text-primary">
+          General
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          {generalKeybinds.map((kb, index) => (
+            <Keybind key={index} {...kb} />
+          ))}
+        </div>
+
+        <p className="text-lg font-semibold leading-none text-primary">
+          Copy n&apos; Paste
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          {fileKeybinds.map((kb, index) => (
+            <Keybind key={index} {...kb} />
+          ))}
+        </div>
       </DialogContent>
     </Dialog>
   );

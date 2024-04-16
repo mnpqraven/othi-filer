@@ -7,11 +7,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useScroll } from "@/hooks/event/useScroll";
-import {
-  useBack,
-  useListDir,
-  usePanelConfig,
-} from "@/hooks/dirAction/useUIAction";
+import { useBack, useListDir, useUiState } from "@/hooks/dirAction/useUIAction";
 import { DirPanelItem } from "./DirPanelItem";
 import { panelSideAtom, selectedIdMouseAtom } from "./_store";
 
@@ -25,7 +21,7 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
       threshold: 300,
     });
     const side = useAtomValue(panelSideAtom);
-    const { data: panelState } = usePanelConfig({ side });
+    const { data: panelState } = useUiState({ select: (data) => data[side] });
     const { data, isLoading } = useListDir({
       path: cursorPath,
       show_hidden: panelState?.show_hidden,

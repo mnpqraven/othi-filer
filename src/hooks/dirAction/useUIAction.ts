@@ -14,12 +14,12 @@ import {
   type DirItem,
   type ListDirRequest,
   type Side,
-  type DirActionPanel,
   type UpdatePathRequest,
   type SelectRequest,
   type CopyUiState,
 } from "@/bindings/taurpc";
 import { createRpc } from "@/bindings";
+import { type QueryParam } from "@/lib/generics";
 
 export function useUpdateState() {
   const client = useQueryClient();
@@ -30,30 +30,16 @@ export function useUpdateState() {
   return { refetch, update };
 }
 
-export function useUiState() {
+export function useUiState<T = CopyUiState>(
+  opt: QueryParam<CopyUiState, T> = {},
+) {
   return useQuery({
     queryKey: ["data", "app_state"],
     queryFn: async () => {
       const r = await createRpc();
       return await r.data.get_state();
     },
-  });
-}
-
-export function usePanelConfig(
-  { side }: { side: Side },
-  queryOpt?: Partial<
-    UseQueryOptions<CopyUiState, Error, DirActionPanel, unknown[]>
-  >,
-) {
-  return useQuery({
-    queryKey: ["data", "app_state", side],
-    select: (data) => data[side],
-    ...queryOpt,
-    queryFn: async () => {
-      const r = await createRpc();
-      return await r.data.get_state();
-    },
+    ...opt,
   });
 }
 

@@ -14,8 +14,8 @@ import { useAtomValue } from "jotai";
 import { Button } from "@/components/ui/button";
 import {
   useListDir,
-  usePanelConfig,
   useSetHidden,
+  useUiState,
   useUpdateCursorPath,
   useUpdateState,
 } from "@/hooks/dirAction/useUIAction";
@@ -36,21 +36,12 @@ import { DirContainer } from "./DirContainer";
 type Prop = Omit<HTMLAttributes<HTMLDivElement>, "children">;
 export function Panel({ className, ...props }: Prop) {
   const side = useAtomValue(panelSideAtom);
-  const { data: panelState } = usePanelConfig({ side });
-
+  const { data: panelState } = useUiState({ select: (data) => data[side] });
   const { mutate: setHidden } = useSetHidden();
-
-  if (!panelState) return "loading panelstate...";
-
-  const { current_pointer_path, show_hidden } = panelState;
 
   return (
     <div className={cn("flex flex-col gap-2", className)} {...props}>
-      <Input
-        value={panelState.current_pointer_path}
-        readOnly
-        className="shrink-0"
-      />
+      <Input value={panelState?.current_pointer_path ?? ""} readOnly />
 
       <div className="flex justify-between">
         <div className="flex items-center gap-2.5">
@@ -82,7 +73,7 @@ export function Panel({ className, ...props }: Prop) {
         <div className="flex items-center space-x-2">
           <Checkbox
             id="hidden"
-            checked={show_hidden}
+            checked={panelState?.show_hidden}
             onCheckedChange={(checked) => {
               const to = checked === "indeterminate" ? false : checked;
               setHidden({ side, to });
@@ -91,13 +82,15 @@ export function Panel({ className, ...props }: Prop) {
           <Label htmlFor="hidden">Hidden Files</Label>
         </div>
       </div>
-      {panelState.current_pointer_path ? (
+      {panelState?.current_pointer_path ? (
         <DirContainer
-          cursorPath={current_pointer_path}
+          cursorPath={panelState.current_pointer_path}
           scrollToTop
           className="flex-1"
         />
-      ) : null}
+      ) : (
+        <div className="rounded-md h-full border" />
+      )}
     </div>
   );
 }
@@ -107,7 +100,7 @@ const RefreshButton = forwardRef<
   Omit<HTMLAttributes<HTMLButtonElement>, "onClick">
 >(function RefreshButton({ className, children, ...props }, ref) {
   const side = useAtomValue(panelSideAtom);
-  const { data: panelState } = usePanelConfig({ side });
+  const { data: panelState } = useUiState({ select: (data) => data[side] });
   const { refetch } = useUpdateState();
   const { refetch: refetchDir } = useListDir({
     path: panelState?.current_pointer_path,
@@ -172,8 +165,8 @@ const CopyButton = forwardRef<
   Omit<HTMLAttributes<HTMLButtonElement>, "onClick"> & { side: Side }
 >(function CopyButton({ side, className, children, ...props }, ref) {
   const { mutate } = useCopy();
-  const { data: leftData } = usePanelConfig({ side: "left" });
-  const { data: rightData } = usePanelConfig({ side: "right" });
+  const { data: leftData } = useUiState({ select: (data) => data.left });
+  const { data: rightData } = useUiState({ select: (data) => data.right });
 
   function onCopy() {
     if (leftData && rightData) {
@@ -225,8 +218,8 @@ const MoveButton = forwardRef<
   Omit<HTMLAttributes<HTMLButtonElement>, "onClick">
 >(function MoveButton({ className, children, ...props }, ref) {
   const { mutate } = useMove();
-  const { data: leftData } = usePanelConfig({ side: "left" });
-  const { data: rightData } = usePanelConfig({ side: "right" });
+  const { data: leftData } = useUiState({ select: (data) => data.left });
+  const { data: rightData } = useUiState({ select: (data) => data.right });
 
   function onMove() {
     if (leftData && rightData) {

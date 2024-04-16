@@ -21,10 +21,12 @@ const TANSTACK_CONFIG: QueryClientConfig = {
     mutations: {
       onError(error) {
         // safe hardcast as soon as rust' error struct remains unchanged
-        const { kind, message } = error as unknown as AppErrorIpc;
-        toast.error(kind, {
-          description: message,
-        });
+        if ("message" in error) {
+          const { kind, message } = error as unknown as AppErrorIpc;
+          toast.error(kind, {
+            description: message,
+          });
+        }
       },
     },
   },
