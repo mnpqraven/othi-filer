@@ -81,6 +81,8 @@ dependencies = [
  "taurpc",
  "thiserror",
  "tokio",
+ "tracing",
+ "tracing-subscriber",
  "walkdir",
 ]
 

@@ -20,7 +20,15 @@ root_path: string;
  */
 current_pointer_path: string; show_hidden: boolean; items: DirItem[]; expanded_paths: string[]; selected_items: string[] }
 
-export type DirItem = { path: string; short_path: string; is_folder: boolean; permissions: DirPermission | null }
+export type DirItem = { 
+/**
+ * the full path of the current panel
+ */
+path: string; 
+/**
+ * the truncated path of the current panel
+ */
+short_path: string; is_folder: boolean; permissions: DirPermission | null }
 
 export type DirPermission = { readable: boolean; writable: boolean; executable: boolean }
 
@@ -52,7 +60,7 @@ export type ToggleHiddenRequest = { side: Side; to: boolean }
 
 export type UpdatePathRequest = { side: Side; to: string }
 
-const ARGS_MAP = {"actions.ui":"{\"toggle_expand\":[\"params\"],\"toggle_hidden\":[\"params\"],\"forward\":[\"params\"],\"list_dir\":[\"params\"],\"set_copy_wrapping_dir\":[\"to\"],\"swap_sides\":[],\"back\":[\"params\"],\"select\":[\"params\"],\"update_cursor_path\":[\"params\"]}","actions.file":"{\"copy\":[\"params\"],\"moves\":[\"params\"]}","data":"{\"get_state\":[]}"}
+const ARGS_MAP = {"actions.ui":"{\"select\":[\"params\"],\"set_copy_wrapping_dir\":[\"to\"],\"back\":[\"params\"],\"update_cursor_path\":[\"params\"],\"list_dir\":[\"params\"],\"swap_sides\":[],\"toggle_hidden\":[\"params\"],\"forward\":[\"params\"],\"toggle_expand\":[\"params\"]}","data":"{\"get_state\":[]}","actions.file":"{\"copy\":[\"params\"],\"moves\":[\"params\"]}"}
 import { createTauRPCProxy as createProxy } from "taurpc"
 
 export const createTauRPCProxy = () => createProxy<Router>(ARGS_MAP)

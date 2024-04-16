@@ -56,6 +56,7 @@ pub struct GlobalUiConfig {
 
 // ----------------- INPUTS
 
+#[derive(Debug)]
 #[taurpc::ipc_type]
 pub struct ToggleExpandRequest {
     pub side: Side,
@@ -63,18 +64,21 @@ pub struct ToggleExpandRequest {
     pub expanded: Option<bool>,
 }
 
+#[derive(Debug)]
 #[taurpc::ipc_type]
 pub struct ToggleHiddenRequest {
     pub side: Side,
     pub to: bool,
 }
 
+#[derive(Debug)]
 #[taurpc::ipc_type]
 pub struct UpdatePathRequest {
     pub side: Side,
     pub to: String,
 }
 
+#[derive(Debug)]
 #[taurpc::ipc_type]
 pub struct ListDirRequest {
     pub path: String,
@@ -82,6 +86,7 @@ pub struct ListDirRequest {
     pub side: Side,
 }
 
+#[derive(Debug)]
 #[taurpc::ipc_type]
 pub struct SelectRequest {
     pub side: Side,

@@ -11,6 +11,8 @@ use tauri::Manager;
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
+    tracing_subscriber::fmt().init();
+
     let router = create_router().await?;
 
     tauri::Builder::default()

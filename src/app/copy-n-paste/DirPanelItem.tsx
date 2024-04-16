@@ -35,13 +35,6 @@ export function DirPanelItem({ dirItem, className, ...props }: Prop) {
     { enabled: panelState?.show_hidden !== undefined && dirIsExpanded },
   );
 
-  if (isLoading)
-    return (
-      <>
-        <Loader className="animate-spin" />
-        Loading ...
-      </>
-    );
   return (
     <>
       <div className={cn("flex items-center gap-2", className)} {...props}>
@@ -49,7 +42,7 @@ export function DirPanelItem({ dirItem, className, ...props }: Prop) {
 
         <ExpandButton {...dirItem} />
 
-        <FileMetaBlock {...dirItem} />
+        <FileMetaBlock {...dirItem} loading={isLoading} />
       </div>
 
       {dirIsExpanded && listDirData?.length ? (
@@ -108,7 +101,7 @@ function ExpandButton({ is_folder, path }: DirItem) {
   );
 }
 
-function FileMetaBlock(item: DirItem) {
+function FileMetaBlock(item: DirItem & { loading: boolean }) {
   const { is_folder, path, short_path } = item;
   const { mutate } = useForward();
   const side = useAtomValue(panelSideAtom);
@@ -144,6 +137,7 @@ function FileMetaBlock(item: DirItem) {
         <File className="h-4 w-4 shrink-0" />
       )}
       <FileName path={short_path} className="w-full" />
+      {item.loading ? <Loader className="h-4 w-4 animate-spin" /> : null}
     </Button>
   );
 }

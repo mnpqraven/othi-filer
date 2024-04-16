@@ -7,9 +7,12 @@ use std::{
     fs, io,
     path::{Path, PathBuf},
 };
+use tracing::*;
 use walkdir::WalkDir;
 
+#[instrument]
 pub async fn copy_wrapper(params: CopyRequest, cleanup_deletion: bool) -> Result<(), AppError> {
+    info!(?params);
     let CopyRequest {
         from,
         to,
@@ -17,10 +20,10 @@ pub async fn copy_wrapper(params: CopyRequest, cleanup_deletion: bool) -> Result
         strategy,
         includes_wrapping_dir,
     } = params;
-    let strategy = strategy.unwrap_or(CopyStrategy::DepthFirst);
+    let strategy = strategy.unwrap_or_default();
 
     match strategy {
-        CopyStrategy::BreathFirst => todo!(),
+        CopyStrategy::BreathFirst => Err(AppError::Unimplemented),
         CopyStrategy::DepthFirst => {
             copy_depth_first(
                 from,
@@ -29,11 +32,9 @@ pub async fn copy_wrapper(params: CopyRequest, cleanup_deletion: bool) -> Result
                 includes_hidden,
                 cleanup_deletion,
             )
-            .await?
+            .await
         }
     }
-
-    Ok(())
 }
 
 async fn copy_depth_first<P: AsRef<Path>>(
@@ -44,9 +45,9 @@ async fn copy_depth_first<P: AsRef<Path>>(
     cleanup_deletion: bool,
 ) -> Result<(), AppError> {
     let to = to.as_ref().to_path_buf();
-    let froms = froms.iter().map(PathBuf::from).collect::<Vec<PathBuf>>();
+    let from_paths = froms.iter().map(PathBuf::from).collect::<Vec<PathBuf>>();
 
-    for from_path in froms.clone() {
+    for from_path in from_paths.clone() {
         // appending wrapping folder
         let to_checked_wrapper = match (includes_wrapping_dir, from_path.file_name()) {
             (true, Some(file_name)) => to.join(file_name),
@@ -98,7 +99,7 @@ async fn copy_depth_first<P: AsRef<Path>>(
     }
 
     if cleanup_deletion {
-        for from in froms {
+        for from in from_paths {
             for entry in WalkDir::new(&from) {
                 let entry = entry?;
                 let entry_path = entry.path();

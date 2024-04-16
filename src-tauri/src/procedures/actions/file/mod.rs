@@ -5,6 +5,7 @@ use crate::common::{error::AppError, AppStateArc};
 use serde::{Deserialize, Serialize};
 
 // TODO: move to own file
+#[derive(Debug)]
 #[taurpc::ipc_type]
 pub struct CopyRequest {
     from: Vec<String>,
@@ -14,9 +15,10 @@ pub struct CopyRequest {
     includes_wrapping_dir: bool,
 }
 
-#[derive(Serialize, Deserialize, specta::Type, Clone)]
+#[derive(Debug, Default, Serialize, Deserialize, specta::Type, Clone)]
 pub enum CopyStrategy {
     BreathFirst,
+    #[default]
     DepthFirst,
 }
 

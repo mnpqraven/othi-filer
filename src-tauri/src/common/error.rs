@@ -25,6 +25,8 @@ pub enum AppError {
     FileNameFormat,
     #[error("Invalid path: {0}")]
     InvalidPath(String),
+    #[error("This feature is not yet unimplemented")]
+    Unimplemented,
 }
 
 impl AppError {

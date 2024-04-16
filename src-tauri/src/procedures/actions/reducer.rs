@@ -6,6 +6,7 @@ use crate::common::{error::AppError, AppStateArc};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::api::dir::is_dir;
+use tracing::*;
 
 #[derive(Clone, Serialize, Deserialize, specta::Type, Debug)]
 #[serde(rename_all = "lowercase")]
@@ -14,6 +15,7 @@ pub enum Side {
     Right,
 }
 
+#[derive(Debug)]
 pub enum DirActionSchema {
     UpdateRootPath(UpdatePathRequest),
     UpdateCursorPath(UpdatePathRequest),
@@ -26,11 +28,13 @@ pub enum DirActionSchema {
     SetCopyWrapping(Option<bool>),
 }
 
+#[instrument(skip(guard))]
 pub async fn dispatch_action(
     guard: AppStateArc,
     action: DirActionSchema,
 ) -> Result<CopyUiState, AppError> {
     let mut state = guard.state.lock().await;
+    info!(?action);
 
     match action {
         DirActionSchema::UpdateRootPath(UpdatePathRequest { side, to }) => {
