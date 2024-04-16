@@ -2,9 +2,14 @@
 
 import { type ComponentPropsWithoutRef } from "react";
 import { type Side } from "@/bindings/taurpc";
-import { useUpdateState } from "@/hooks/dirAction/useUIAction";
+import {
+  useSetCopyWrappingDir,
+  useUiState,
+  useUpdateState,
+} from "@/hooks/dirAction/useUIAction";
 import {
   ContextMenu,
+  ContextMenuCheckboxItem,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuSeparator,
@@ -30,6 +35,8 @@ interface Prop extends ComponentPropsWithoutRef<typeof ContextMenuTrigger> {
 }
 export function ContextMenuContainer({ context, children, ...props }: Prop) {
   const { refetch } = useUpdateState();
+  const { data: uiState } = useUiState();
+  const { mutate: setCopyWrapping } = useSetCopyWrappingDir();
 
   if (!context)
     return (
@@ -42,13 +49,22 @@ export function ContextMenuContainer({ context, children, ...props }: Prop) {
     <ContextMenu>
       <ContextMenuTrigger {...props}>{children}</ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem onSelect={refetch}>Refresh</ContextMenuItem>
+        <ContextMenuItem inset onSelect={refetch}>
+          Refresh
+        </ContextMenuItem>
         <ContextMenuSeparator />
-        <ContextMenuItem>Check All</ContextMenuItem>
-        <ContextMenuItem>Check selecteds by cursor</ContextMenuItem>
+        <ContextMenuItem inset>Check All</ContextMenuItem>
+        <ContextMenuItem inset>Uncheck All</ContextMenuItem>
         <ContextMenuSeparator />
-        <ContextMenuItem>Uncheck All</ContextMenuItem>
-        <ContextMenuItem>Uncheck selecteds by cursor</ContextMenuItem>
+        <ContextMenuItem inset>Check selecteds by cursor</ContextMenuItem>
+        <ContextMenuItem inset>Uncheck selecteds by cursor</ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuCheckboxItem
+          checked={uiState?.global_config.copy_wrapping_dir}
+          onCheckedChange={setCopyWrapping}
+        >
+          Copy/Move wrapping folder
+        </ContextMenuCheckboxItem>
       </ContextMenuContent>
     </ContextMenu>
   );

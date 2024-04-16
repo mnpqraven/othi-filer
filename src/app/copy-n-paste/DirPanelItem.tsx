@@ -1,4 +1,4 @@
-import { Folder, File, ArrowDownRight, ArrowDown } from "lucide-react";
+import { Folder, File, ArrowDownRight, ArrowDown, Loader } from "lucide-react";
 import { type HTMLAttributes } from "react";
 import { useAtomValue } from "jotai";
 import { cva } from "class-variance-authority";
@@ -10,7 +10,7 @@ import {
   useForward,
   useListDir,
   usePanelConfig,
-  useSelect,
+  useToggleSelect,
   useToggleExpand,
 } from "@/hooks/dirAction/useUIAction";
 import { cn } from "@/lib/utils";
@@ -30,11 +30,18 @@ export function DirPanelItem({ dirItem, className, ...props }: Prop) {
   const dirIsExpanded = Boolean(
     panelState?.expanded_paths.find((e) => e === dirItem.path),
   );
-  const { data: listDirData } = useListDir(
+  const { data: listDirData, isLoading } = useListDir(
     { path: dirItem.path, show_hidden: panelState?.show_hidden, side },
     { enabled: panelState?.show_hidden !== undefined && dirIsExpanded },
   );
 
+  if (isLoading)
+    return (
+      <>
+        <Loader className="animate-spin" />
+        Loading ...
+      </>
+    );
   return (
     <>
       <div className={cn("flex items-center gap-2", className)} {...props}>
@@ -57,21 +64,26 @@ export function DirPanelItem({ dirItem, className, ...props }: Prop) {
 }
 
 function SelectButton({ path }: DirItem) {
-  const { mutate } = useSelect();
+  const { mutate: select } = useToggleSelect();
   const side = useAtomValue(panelSideAtom);
+  const { data: panelData } = usePanelConfig({ side });
+
+  const checked = panelData?.selected_items.includes(path) ?? false;
 
   return (
     <Checkbox
+      tabIndex={-1}
+      checked={checked}
       onCheckedChange={(e) => {
         const selected = e === "indeterminate" ? false : e;
-        mutate({ side, path, selected });
+        select({ side, paths: [path], selected });
       }}
     />
   );
 }
 
 function ExpandButton({ is_folder, path }: DirItem) {
-  const { mutate: toggleExpand } = useToggleExpand();
+  const { mutate: expand } = useToggleExpand();
   const side = useAtomValue(panelSideAtom);
   const { data: panelState } = usePanelConfig({ side });
 
@@ -80,11 +92,12 @@ function ExpandButton({ is_folder, path }: DirItem) {
   if (!is_folder) return null;
   return (
     <Button
+      tabIndex={-1}
       variant="ghost"
-      className="p-0 h-auto"
+      className="h-auto p-0"
       onClick={() => {
-        toggleExpand({
-          folder_path: path,
+        expand({
+          paths: [path],
           side,
           expanded: !expanded,
         });
@@ -100,15 +113,17 @@ function FileMetaBlock(item: DirItem) {
   const { mutate } = useForward();
   const side = useAtomValue(panelSideAtom);
   const selectedIds = useAtomValue(selectedIdMouseAtom);
-  const isSelected = selectedIds.includes(`diritem-selector-${item.path}`);
+  const isSelected = selectedIds.includes(
+    `diritem-selector-${side}-${item.path}`,
+  );
 
   const variants = cva(
-    "min-w-48 justify-start gap-2 px-2 py-0.5 hover:underline h-auto border border-transparent",
+    "min-w-48 h-auto justify-start gap-2 border border-transparent px-2 py-0.5 hover:underline",
     {
       variants: {
         variant: {
           default: "",
-          selected: "bg-accent/30 text-accent-foreground border-accent",
+          selected: "border-accent bg-accent/30 text-accent-foreground",
         },
       },
     },
@@ -116,7 +131,7 @@ function FileMetaBlock(item: DirItem) {
 
   return (
     <Button
-      id={`diritem-selector-${item.path}`}
+      id={`diritem-selector-${side}-${item.path}`}
       variant="ghost"
       className={variants({ variant: isSelected ? "selected" : "default" })}
       onDoubleClick={() => {

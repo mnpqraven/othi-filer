@@ -1,21 +1,22 @@
 use super::{list_dir::list_dir, reducer::Side};
-use crate::procedures::data::home::home_dir;
+use crate::{common::error::AppError, procedures::data::home::home_dir};
 
 #[derive(Debug)]
 #[taurpc::ipc_type]
 pub struct CopyUiState {
     pub left: DirActionPanel,
     pub right: DirActionPanel,
+    pub global_config: GlobalUiConfig,
 }
 
 impl CopyUiState {
-    pub async fn new() -> Result<Self, String> {
-        let home_path = home_dir().unwrap();
+    pub async fn new() -> Result<Self, AppError> {
+        let home_path = home_dir()?;
         let default_panel: DirActionPanel = DirActionPanel {
             root_path: home_path.clone(),
             current_pointer_path: home_path.clone(),
             show_hidden: false,
-            items: list_dir(&home_path, false, Some(&home_path)).unwrap(),
+            items: list_dir(&home_path, false, Some(&home_path))?,
             selected_items: vec![],
             expanded_paths: vec![],
         };
@@ -23,6 +24,11 @@ impl CopyUiState {
         Ok(Self {
             left: default_panel.clone(),
             right: default_panel.clone(),
+            global_config: {
+                GlobalUiConfig {
+                    copy_wrapping_dir: false,
+                }
+            },
         })
     }
 }
@@ -42,13 +48,19 @@ pub struct DirActionPanel {
     pub selected_items: Vec<String>,
 }
 
+#[derive(Debug)]
+#[taurpc::ipc_type]
+pub struct GlobalUiConfig {
+    pub copy_wrapping_dir: bool,
+}
+
 // ----------------- INPUTS
 
 #[taurpc::ipc_type]
 pub struct ToggleExpandRequest {
     pub side: Side,
-    pub folder_path: String,
-    pub expanded: bool,
+    pub paths: Vec<String>,
+    pub expanded: Option<bool>,
 }
 
 #[taurpc::ipc_type]
@@ -73,8 +85,8 @@ pub struct ListDirRequest {
 #[taurpc::ipc_type]
 pub struct SelectRequest {
     pub side: Side,
-    pub path: String,
-    pub selected: bool,
+    pub paths: Vec<String>,
+    pub selected: Option<bool>,
 }
 
 // ----------------- OUTPUTS
@@ -91,9 +103,9 @@ pub struct ListDirOut {
 #[derive(Default, Debug)]
 #[taurpc::ipc_type]
 pub struct DirItem {
-    // the full path of the current panel
+    /// the full path of the current panel
     pub path: String,
-    // the truncated path of the current panel
+    /// the truncated path of the current panel
     pub short_path: String,
     pub is_folder: bool,
     pub permissions: Option<DirPermission>,

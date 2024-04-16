@@ -1,5 +1,5 @@
 import { forwardRef, useRef, type ComponentPropsWithoutRef } from "react";
-import { ArrowUpToLine } from "lucide-react";
+import { ArrowUpToLine, Loader } from "lucide-react";
 import { Transition } from "@headlessui/react";
 import { useAtomValue, useStore } from "jotai";
 import Selecto from "react-selecto";
@@ -26,7 +26,7 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
     });
     const side = useAtomValue(panelSideAtom);
     const { data: panelState } = usePanelConfig({ side });
-    const { data } = useListDir({
+    const { data, isLoading } = useListDir({
       path: cursorPath,
       show_hidden: panelState?.show_hidden,
       side,
@@ -36,7 +36,6 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
     const { set } = useStore();
     const selectoRef = useRef<Selecto>(null);
 
-    if (!data) return "listdir loading...";
     return (
       <ScrollArea
         className={cn("relative rounded-md border py-2 pl-3 pr-2.5", className)}
@@ -81,21 +80,26 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
           }}
         />
 
-        <div className="flex flex-col gap-2">
-          <Button
-            variant="ghost"
-            className="ml-6 w-full justify-start"
-            onClick={() => {
-              mutate(side);
-            }}
-          >
-            ..
+        {isLoading ? (
+          <Button className="animate w-full" variant="ghost">
+            <Loader className="animate-spin" />
+            Loading ...
           </Button>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <Button
+              variant="ghost"
+              className="ml-6 w-full justify-start"
+              onClick={() => {
+                mutate(side);
+              }}
+            >
+              ..
+            </Button>
 
-          {data.map((dir) => (
-            <DirPanelItem dirItem={dir} key={dir.path} />
-          ))}
-        </div>
+            {data?.map((dir) => <DirPanelItem dirItem={dir} key={dir.path} />)}
+          </div>
+        )}
 
         {/* NOTE: better to mask this ? */}
         {scrollToTop ? (
@@ -109,6 +113,7 @@ export const DirContainer = forwardRef<HTMLDivElement, Prop>(
             leaveTo="opacity-0"
           >
             <Button
+              tabIndex={-1}
               className="absolute bottom-4 right-4 rounded-full p-2.5"
               variant="outline"
               onClick={() => {

@@ -13,7 +13,7 @@ import {
 import { toast } from "sonner";
 import { type AppErrorIpc } from "@/bindings/taurpc";
 import { TooltipProvider } from "../ui/tooltip";
-import { ProcessEventHandlers } from "./eventHandlers";
+import { RootEventHandlers } from "./eventHandlers/root";
 
 const TANSTACK_CONFIG: QueryClientConfig = {
   defaultOptions: {
@@ -43,13 +43,13 @@ export function AppProvider({ children }: Prop) {
       <ThemeProvider attribute="class">
         <QueryClientProvider client={queryClient}>
           <Provider>
-            <ProcessEventHandlers>
+            <RootEventHandlers>
               {children}
 
               {/* NOTE: comment this if using devtools inside panel */}
               <DevTools theme="dark" />
               <ReactQueryDevtools initialIsOpen={false} />
-            </ProcessEventHandlers>
+            </RootEventHandlers>
           </Provider>
         </QueryClientProvider>
       </ThemeProvider>
