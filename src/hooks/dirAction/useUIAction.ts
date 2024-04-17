@@ -70,7 +70,7 @@ export function useListDir(
     ...opt,
     queryKey: ["actions", "list_dir", { path, show_hidden }],
     queryFn:
-      path && side && show_hidden
+      path && side && show_hidden !== undefined
         ? async () => {
             const r = await createRpc();
             return await r.actions.ui.list_dir({

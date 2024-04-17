@@ -74,6 +74,7 @@ version = "0.1.0"
 dependencies = [
  "faccess",
  "itertools",
+ "rand 0.8.5",
  "serde",
  "serde_json",
  "specta",

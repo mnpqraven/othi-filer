@@ -1,8 +1,17 @@
 pub mod copy;
+pub mod rename;
 
 use self::copy::copy_wrapper;
 use crate::common::{error::AppError, AppStateArc};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+#[taurpc::ipc_type]
+pub struct RenameRequest {
+    path: String,
+    from: String,
+    to: String,
+}
 
 // TODO: move to own file
 #[derive(Debug)]
@@ -26,6 +35,8 @@ pub enum CopyStrategy {
 pub trait FileAction {
     async fn copy(params: CopyRequest) -> Result<(), AppError>;
     async fn moves(params: CopyRequest) -> Result<(), AppError>;
+    async fn rename(params: RenameRequest) -> Result<(), AppError>;
+    async fn bulk_rename(params: Vec<RenameRequest>) -> Result<(), AppError>;
 }
 
 #[taurpc::resolvers]
@@ -46,5 +57,12 @@ impl FileAction for AppStateArc {
     async fn moves(self, params: CopyRequest) -> Result<(), AppError> {
         let state = self.state.lock().await;
         copy_wrapper(params, state.global_config.copy_wrapping_dir).await
+    }
+
+    async fn rename(self, params: RenameRequest) -> Result<(), AppError> {
+        rename::rename(params)
+    }
+    async fn bulk_rename(self, _params: Vec<RenameRequest>) -> Result<(), AppError> {
+        Err(AppError::Unimplemented)
     }
 }
