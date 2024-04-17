@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 use super::types::DirItem;
 use crate::{
     common::{error::AppError, os::file_name},
@@ -25,7 +23,6 @@ pub fn list_dir(
         .filter(|disk_entry| {
             let hidden = match show_hidden {
                 true => true,
-                // TODO: handle unwrap
                 false => !is_hidden(&disk_entry.path).unwrap_or_default(),
             };
             // filters out jank ass windows folders like Recent or Start Menu
