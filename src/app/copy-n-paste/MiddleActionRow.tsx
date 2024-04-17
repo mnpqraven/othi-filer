@@ -11,30 +11,28 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-interface Prop extends HTMLAttributes<HTMLDivElement> {
-  hello?: "world";
-}
-export const MiddleActionRow = forwardRef<HTMLDivElement, Prop>(
-  function MiddleActionRow({ className, ...props }, ref) {
-    const { mutate: swapSide } = useSwapSides();
+export const MiddleActionRow = forwardRef<
+  HTMLDivElement,
+  HTMLAttributes<HTMLDivElement>
+>(function MiddleActionRow({ className, ...props }, ref) {
+  const { mutate: swapSide } = useSwapSides();
 
-    return (
-      <div {...props} ref={ref} className={cn("", className)}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              className="p-2.5"
-              onClick={() => {
-                swapSide();
-              }}
-            >
-              <ArrowRightLeft />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Swap sides</TooltipContent>
-        </Tooltip>
-      </div>
-    );
-  },
-);
+  return (
+    <div {...props} ref={ref} className={cn("", className)}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            className="p-2.5"
+            onClick={() => {
+              swapSide();
+            }}
+          >
+            <ArrowRightLeft />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Swap sides</TooltipContent>
+      </Tooltip>
+    </div>
+  );
+});

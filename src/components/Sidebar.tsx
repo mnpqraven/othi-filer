@@ -1,10 +1,11 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { useQuery } from "@tanstack/react-query";
 import { sidebarOpenAtom } from "@/app/store";
 import {
+  uiStateQuery,
   useSetCopyWrappingDir,
-  useUiState,
 } from "@/hooks/dirAction/useUIAction";
 import {
   Sheet,
@@ -18,7 +19,7 @@ import { Switch } from "./ui/switch";
 export function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useAtom(sidebarOpenAtom);
 
-  const { data: uiState } = useUiState();
+  const { data: uiState } = useQuery(uiStateQuery);
   const { mutate: setCopyWrapping } = useSetCopyWrappingDir();
 
   return (

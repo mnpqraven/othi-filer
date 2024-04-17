@@ -2,6 +2,7 @@
 
 import {
   keepPreviousData,
+  queryOptions,
   skipToken,
   useMutation,
   useQuery,
@@ -19,29 +20,45 @@ import {
   type CopyUiState,
 } from "@/bindings/taurpc";
 import { createRpc } from "@/bindings";
-import { type QueryParam } from "@/lib/generics";
 
 export function useUpdateState() {
   const client = useQueryClient();
-  const refetch = () =>
-    client.refetchQueries({ queryKey: ["data", "app_state"] });
-  const update = (to: CopyUiState) =>
-    client.setQueriesData({ queryKey: ["data", "app_state"] }, to);
+  const { queryKey } = uiStateQuery;
+  const refetch = () => client.refetchQueries({ queryKey });
+  const update = (to: CopyUiState) => client.setQueriesData({ queryKey }, to);
   return { refetch, update };
 }
 
-export function useUiState<T = CopyUiState>(
-  opt: QueryParam<CopyUiState, T> = {},
-) {
-  return useQuery({
-    queryKey: ["data", "app_state"],
-    queryFn: async () => {
-      const r = await createRpc();
-      return await r.data.get_state();
-    },
-    ...opt,
+export const uiStateQuery = queryOptions({
+  queryKey: ["data", "app_state"],
+  queryFn: async () => {
+    const r = await createRpc();
+    return await r.data.get_state();
+  },
+});
+
+export const listDirQuery = ({
+  path,
+  show_hidden,
+  side,
+}: Partial<ListDirRequest>) =>
+  queryOptions({
+    enabled:
+      Boolean(path?.length) && show_hidden !== undefined && Boolean(side),
+    queryKey: ["actions", "list_dir", { path, show_hidden }],
+    queryFn:
+      path && side && show_hidden
+        ? async () => {
+            const r = await createRpc();
+            return await r.actions.ui.list_dir({
+              path,
+              show_hidden,
+              side,
+            });
+          }
+        : skipToken,
+    placeholderData: keepPreviousData,
   });
-}
 
 export function useListDir(
   { path, show_hidden, side }: Partial<ListDirRequest>,

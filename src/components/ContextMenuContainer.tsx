@@ -1,10 +1,11 @@
 "use client";
 
 import { type ComponentPropsWithoutRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { type Side } from "@/bindings/taurpc";
 import {
+  uiStateQuery,
   useSetCopyWrappingDir,
-  useUiState,
   useUpdateState,
 } from "@/hooks/dirAction/useUIAction";
 import {
@@ -35,7 +36,7 @@ interface Prop extends ComponentPropsWithoutRef<typeof ContextMenuTrigger> {
 }
 export function ContextMenuContainer({ context, children, ...props }: Prop) {
   const { refetch } = useUpdateState();
-  const { data: uiState } = useUiState();
+  const { data: uiState } = useQuery(uiStateQuery);
   const { mutate: setCopyWrapping } = useSetCopyWrappingDir();
 
   if (!context)

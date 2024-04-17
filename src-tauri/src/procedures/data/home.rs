@@ -1,5 +1,4 @@
 use crate::common::error::AppError;
-use itertools::Itertools;
 
 pub fn home_dir() -> Result<String, AppError> {
     let dir = tauri::api::path::home_dir();
@@ -14,31 +13,31 @@ pub fn home_dir() -> Result<String, AppError> {
 }
 
 pub fn get_logical_drives() -> Result<Vec<String>, AppError> {
-    if cfg!(windows) {
-        unsafe {
-            // 'C' ':' '\\' 'NUL'
-            // times 26
-            let mut buffer = [0, 0, 0, 0].repeat(26);
-            windows::Win32::Storage::FileSystem::GetLogicalDriveStringsA(Some(&mut buffer));
+    #[cfg(windows)]
+    unsafe {
+        use itertools::Itertools;
+        // 'C' ':' '\\' 'NUL'
+        // worst case times 26
+        let mut buffer = [0, 0, 0, 0].repeat(26);
+        windows::Win32::Storage::FileSystem::GetLogicalDriveStringsA(Some(&mut buffer));
 
-            let mut drives_bytes: Vec<Vec<u8>> = Vec::new();
-            for (_, group) in &buffer.into_iter().group_by(|ch| *ch > 0) {
-                drives_bytes.push(group.collect());
-            }
-
-            drives_bytes.retain(|grp| grp.iter().all(|ch| *ch > 0));
-            let drives: Vec<String> = drives_bytes
-                .iter()
-                .flat_map(|bytes| match std::str::from_utf8(bytes) {
-                    Ok(res) => Ok(res.to_string()),
-                    Err(e) => Err(AppError::GenericError(e.to_string())),
-                })
-                .collect();
-            Ok(drives)
+        let mut drives_bytes: Vec<Vec<u8>> = Vec::new();
+        for (_, group) in &buffer.into_iter().group_by(|ch| *ch > 0) {
+            drives_bytes.push(group.collect());
         }
-    } else {
-        Err(AppError::Unimplemented)
+
+        drives_bytes.retain(|grp| grp.iter().all(|ch| *ch > 0));
+        let drives: Vec<String> = drives_bytes
+            .iter()
+            .flat_map(|bytes| match std::str::from_utf8(bytes) {
+                Ok(res) => Ok(res.to_string()),
+                Err(e) => Err(AppError::GenericError(e.to_string())),
+            })
+            .collect();
+        Ok(drives)
     }
+    #[cfg(not(windows))]
+    Err(AppError::Unimplemented)
 }
 
 #[cfg(test)]

@@ -42,9 +42,9 @@ export type SelectRequest = { side: Side; paths: string[]; selected: boolean | n
 
 export type Side = "left" | "right"
 
-export type TauRpcDataInputTypes = { proc_name: "get_state"; input_type: null }
+export type TauRpcDataInputTypes = { proc_name: "get_state"; input_type: null } | { proc_name: "get_windows_drives"; input_type: null }
 
-export type TauRpcDataOutputTypes = { proc_name: "get_state"; output_type: CopyUiState }
+export type TauRpcDataOutputTypes = { proc_name: "get_state"; output_type: CopyUiState } | { proc_name: "get_windows_drives"; output_type: string[] }
 
 export type TauRpcFileActionInputTypes = { proc_name: "copy"; input_type: { __taurpc_type: CopyRequest } } | { proc_name: "moves"; input_type: { __taurpc_type: CopyRequest } }
 
@@ -60,7 +60,7 @@ export type ToggleHiddenRequest = { side: Side; to: boolean }
 
 export type UpdatePathRequest = { side: Side; to: string }
 
-const ARGS_MAP = {"actions.ui":"{\"set_copy_wrapping_dir\":[\"to\"],\"forward\":[\"params\"],\"select\":[\"params\"],\"list_dir\":[\"params\"],\"update_cursor_path\":[\"params\"],\"toggle_hidden\":[\"params\"],\"back\":[\"params\"],\"toggle_expand\":[\"params\"],\"swap_sides\":[]}","data":"{\"get_state\":[]}","actions.file":"{\"moves\":[\"params\"],\"copy\":[\"params\"]}"}
+const ARGS_MAP = {"actions.file":"{\"copy\":[\"params\"],\"moves\":[\"params\"]}","data":"{\"get_windows_drives\":[],\"get_state\":[]}","actions.ui":"{\"update_cursor_path\":[\"params\"],\"forward\":[\"params\"],\"toggle_expand\":[\"params\"],\"back\":[\"params\"],\"select\":[\"params\"],\"swap_sides\":[],\"list_dir\":[\"params\"],\"set_copy_wrapping_dir\":[\"to\"],\"toggle_hidden\":[\"params\"]}"}
 import { createTauRPCProxy as createProxy } from "taurpc"
 
 export const createTauRPCProxy = () => createProxy<Router>(ARGS_MAP)
